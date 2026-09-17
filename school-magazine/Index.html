@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>116週年香山國小校刊</title>
+  <link rel="icon" href="https://drive.google.com/file/d/1xNKnwO09--6kd4gpuiVtS_OCsIrx4Z1P/view?usp=sharing">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            milktea: '#F4ECE4',
+            cardBg: 'rgba(255, 255, 255, 0.7)',
+            morandi: {
+              taupe: '#B4968F',
+              pink: '#F58595',  
+              dark: '#7A635E',  
+              light: '#E8DEDC'  
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .article-content { white-space: pre-wrap; }
+    ::-webkit-scrollbar { display: none; }
+    .hide-scroll-x { overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
+    body.modal-open { overflow: hidden; }
+  </style>
+</head>
+<body class="bg-milktea min-h-screen text-gray-800 font-sans relative md:flex overflow-x-hidden">
+  <!-- ================= 1. 歡迎頁 (Splash Screen) ================= -->
+  <div id="splash-screen" class="fixed inset-0 z-[100] bg-milktea flex flex-col items-center justify-center transition-opacity duration-500">
+    <h1 class="text-4xl md:text-5xl font-extrabold text-morandi-dark mb-2 tracking-wider drop-shadow-sm">香山國小校刊</h1>
+    <p class="text-morandi-dark/80 mb-12 text-lg font-medium tracking-widest bg-morandi-light/50 px-5 py-1.5 rounded-full">探索校園美好點滴</p>
+   
+    <div id="splash-loading" class="flex flex-col items-center">
+      <svg class="animate-spin h-8 w-8 text-morandi-dark mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="text-morandi-dark/60 font-medium tracking-widest">系統載入中...</p>
+    </div>
+    <button id="btn-start-reading" class="bg-morandi-dark text-white px-10 py-4 rounded-full shadow-lg font-bold text-lg tracking-wider hover:opacity-90 hover:scale-105 transition active:scale-95" style="display:none;">
+      開始閱讀
+    </button>
+  </div>
+  
+  <!-- ================= 2. 導覽列 (成長軌跡 - UI/UX 優化) ================= -->
+  <nav class="fixed z-40 bg-white/60 backdrop-blur-2xl border-white/40
+              bottom-0 w-full border-t pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]
+              md:top-0 md:left-0 md:w-56 md:h-screen md:border-t-0 md:border-r md:flex md:flex-col md:pt-10 md:shadow-xl transition-all">
+    <div class="hidden md:block px-6 mb-8">
+      <h1 class="text-2xl font-extrabold text-morandi-dark tracking-wider">香山國小</h1>
+      <h2 class="text-lg font-bold text-morandi-dark/80 tracking-widest">數位校刊</h2>
+    </div>
+    
+    <div class="flex md:flex-col justify-around md:justify-start items-center md:items-stretch w-full max-w-md md:max-w-none mx-auto px-2 md:px-4 md:space-y-2">
+      <!-- 行政 -->
+      <button id="nav-admin" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start w-full transition-colors duration-300 text-morandi-dark md:bg-morandi-light/60 md:p-3 md:rounded-xl group">
+        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M4 10l7.1-6.3a1.3 1.3 0 0 1 1.8 0L20 10"></path>
+          <path d="M6 10v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-9"></path>
+          <path d="M10 21v-5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v5"></path>
+        </svg>
+        <span class="text-[10px] md:text-base font-bold tracking-wider">行政</span>
+      </button>
+      <!-- 低年級 -->
+      <button id="nav-lower" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start w-full transition-colors duration-300 text-gray-400 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
+        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M12 22v-8"></path>
+          <path d="M12 14c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path>
+          <path d="M12 14c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path>
+        </svg>
+        <span class="text-[10px] md:text-base font-bold tracking-wider">低年級</span>
+      </button>
+      <!-- 中年級 -->
+      <button id="nav-middle" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start w-full transition-colors duration-300 text-gray-400 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
+        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M12 22V6"></path>
+          <path d="M12 16c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path>
+          <path d="M12 11c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path>
+          <path d="M12 6c2.5 0 4-2 0-6-4 4-2.5 6 0 6z"></path>
+        </svg>
+        <span class="text-[10px] md:text-base font-bold tracking-wider">中年級</span>
+      </button>
+      <!-- 高年級 -->
+      <button id="nav-upper" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start w-full transition-colors duration-300 text-gray-400 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
+        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M12 22v-6"></path>
+          <path d="M18 16a5 5 0 0 0-1.5-9.5 6 6 0 0 0-10 1 4.5 4.5 0 0 0 1.5 8.5 Z"></path>
+        </svg>
+        <span class="text-[10px] md:text-base font-bold tracking-wider">高年級</span>
+      </button>
+      <!-- 幼兒園 -->
+      <button id="nav-kinder" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start w-full transition-colors duration-300 text-gray-400 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
+        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <path d="M12 3s-6 5-6 10c0 4 3 7 6 7s6-3 6-7c0-5-6-10-6-10z"></path>
+          <path d="M9 12a4 4 0 0 0 0 5"></path>
+        </svg>
+        <span class="text-[10px] md:text-base font-bold tracking-wider">星光班及幼兒園</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ================= 3. 右側主內容區塊 ================= -->
+  <div class="flex-1 flex flex-col min-h-screen md:ml-56">
+    <header class="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-gray-200">
+      <div class="w-full max-w-7xl mx-auto px-4 md:px-8">
+        <div class="flex space-x-2 py-3 hide-scroll-x" id="category-tabs"></div>
+      </div>
+    </header>
+   
+    <div id="subcat-grid" class="p-4 md:p-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 max-w-7xl mx-auto w-full pb-24 md:pb-8" style="display:none;"></div>
+    <main id="article-list" class="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-7xl mx-auto w-full pb-24 md:pb-8" style="display:none;"></main>
+  </div>
+
+  <!-- ================= 4. 閱讀文章彈窗 (UI/UX優化：底部滑出) ================= -->
+  <div id="article-modal" class="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-end md:items-center justify-center p-0 md:p-8 transition-transform duration-300 translate-y-full md:translate-y-0 md:translate-x-full md:opacity-0" style="display:none;">
+   
+    <div id="modal-inner" class="w-full md:w-[85vw] lg:max-w-6xl bg-milktea rounded-t-[2rem] md:rounded-[2rem] shadow-2xl overflow-y-auto h-[95vh] md:h-auto md:max-h-[85vh] relative flex flex-col hide-scroll-x">
+     
+      <!-- 手機端頂部手勢暗示 -->
+      <div class="w-full flex justify-center pt-3 pb-2 md:hidden sticky top-0 z-20 pointer-events-none">
+        <div class="w-12 h-1.5 bg-black/20 rounded-full"></div>
+      </div>
+
+      <header class="absolute top-0 w-full z-10 bg-gradient-to-b from-black/50 to-transparent p-4 flex items-center justify-between pointer-events-none">
+        <div class="flex-1"></div>
+        <button id="btn-close-modal" class="pointer-events-auto text-white bg-black/30 backdrop-blur-md hover:bg-black/50 p-2.5 rounded-full shadow-sm transition active:scale-90 mt-4 md:mt-0 right-4 absolute md:relative">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+        </button>
+      </header>
+      
+      <div id="modal-image-container" class="w-full h-64 md:h-[400px] bg-gray-200" style="display:none;">
+        <img id="modal-cover" src="" class="w-full h-full object-cover">
+      </div>
+     
+      <div class="p-6 md:p-12 lg:p-16 flex-1 bg-milktea/10">
+        <div class="max-w-4xl mx-auto">
+          <div class="mb-6 border-b border-gray-200 pb-4" id="modal-header-padding">
+            <span class="text-xs md:text-sm font-semibold text-morandi-dark bg-morandi-light px-3 py-1.5 rounded-full mb-3 inline-block mt-4" id="modal-category"></span>
+            <h2 class="text-2xl md:text-4xl font-bold text-gray-900 mt-1 mb-4 leading-snug" id="modal-title"></h2>
+            <div class="flex justify-between text-sm md:text-base text-gray-500">
+              <span id="modal-author"></span><span id="modal-date"></span>
+            </div>
+          </div>
+          <div class="article-content text-gray-700 text-base md:text-lg leading-relaxed md:leading-loose mb-10" id="modal-content"></div>
+        </div>
+       
+        <div id="modal-gallery" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-8"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 5. Lightbox 圖片放大 ================= -->
+  <div id="lightbox" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center opacity-0 transition-opacity duration-300 touch-none" style="display:none;">
+    <button id="btn-close-lightbox" class="absolute top-6 right-6 text-white p-3 z-20 bg-black/30 rounded-full hover:bg-white/20 transition active:scale-90">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+    <div id="lightbox-counter" class="absolute top-8 left-6 text-white/70 font-bold z-20 text-sm tracking-widest drop-shadow-md"></div>
+   
+    <button id="btn-prev-img" class="absolute left-4 text-white p-4 z-20 opacity-50 hover:opacity-100 hidden md:block bg-black/30 rounded-full transition">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+    </button>
+    <button id="btn-next-img" class="absolute right-4 text-white p-4 z-20 opacity-50 hover:opacity-100 hidden md:block bg-black/30 rounded-full transition">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+    </button>
+    <div class="w-full h-full flex items-center justify-center overflow-hidden pb-32 px-4 pt-16">
+      <img id="lightbox-img" src="" draggable="false" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl select-none pointer-events-auto" style="transform: scale(0.95); transition: transform 0.3s ease;">
+    </div>
+    <div id="lightbox-caption" class="absolute bottom-[100px] w-full flex justify-center px-4 z-20 pointer-events-none">
+      <span class="inline-block bg-black/40 backdrop-blur-md text-white/95 text-sm md:text-base font-medium tracking-widest px-5 py-2 rounded-full shadow-sm border border-white/20 transition-opacity duration-300" id="lightbox-caption-text"></span>
+    </div>
+    <div id="lightbox-thumbnails" class="absolute bottom-6 w-full flex justify-center space-x-2 px-4 overflow-x-auto hide-scroll-x z-20"></div>
+  </div>
+
+  <script>
+    var globalArticles = [];
+    var currentMainCategory = '行政';
+    var currentSubCategory = '';
+    var currentGalleryData = [];
+    var currentLightboxIndex = 0;
+    
+    // Lightbox 手勢相關變數
+    var imgScale = 1;
+    var imgTranslateX = 0, imgTranslateY = 0;
+    var lastTouchTime = 0, touchStartDistance = 0, isPinching = false;
+    var lastTouchX = 0, lastTouchY = 0;
+
+    function resetImageTransform() {
+      imgScale = 1;
+      imgTranslateX = 0;
+      imgTranslateY = 0;
+      var img = document.getElementById('lightbox-img');
+      if (img) {
+        img.style.transition = 'transform 0.3s ease';
+        img.style.transform = 'translate(0px, 0px) scale(1)';
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('#btn-start-reading')) {
+        var splash = document.getElementById('splash-screen');
+        splash.style.opacity = '0';
+        setTimeout(function() { splash.style.display = 'none'; }, 500);
+        return;
+      }
+      var navBtn = e.target.closest('.nav-btn');
+      if (navBtn) {
+        var targetCat = '';
+        if (navBtn.id === 'nav-admin') targetCat = '行政';
+        else if (navBtn.id === 'nav-lower') targetCat = '低年級';
+        else if (navBtn.id === 'nav-middle') targetCat = '中年級';
+        else if (navBtn.id === 'nav-upper') targetCat = '高年級';
+        else if (navBtn.id === 'nav-kinder') targetCat = '星光班及幼兒園';
+        if (targetCat) setMainCategory(targetCat, navBtn.id);
+        return;
+      }
+      var filterBtn = e.target.closest('.filter-btn');
+      if (filterBtn) { setSubCategory(filterBtn.innerText); return; }
+     
+      var subCatCard = e.target.closest('.sub-cat-card');
+      if (subCatCard) {
+        var catName = subCatCard.querySelector('.cat-name').innerText;
+        setSubCategory(catName);
+        return;
+      }
+     
+      var card = e.target.closest('.article-card');
+      if (card) { openModal(card.id.replace('article-', '')); return; }
+     
+      var thumb = e.target.closest('.gallery-thumb');
+      if (thumb) { openLightbox(parseInt(thumb.id.replace('thumb-', ''), 10)); return; }
+     
+      var lbThumb = e.target.closest('[id^="lb-thumb-"]');
+      if (lbThumb) {
+        currentLightboxIndex = parseInt(lbThumb.id.replace('lb-thumb-', ''), 10);
+        updateLightboxImage();
+        return;
+      }
+     
+      if (e.target.id === 'article-modal') { closeModal(); return; }
+      if (e.target.id === 'lightbox') { closeLightbox(); return; }
+      if (e.target.closest('#btn-close-modal')) closeModal();
+      if (e.target.closest('#btn-close-lightbox')) closeLightbox();
+      if (e.target.closest('#btn-prev-img')) prevImage();
+      if (e.target.closest('#btn-next-img')) nextImage();
+    });
+
+    var touchStartX = 0, touchStartY = 0, touchStartScrollTop = 0;
+    document.addEventListener('touchstart', function(e) {
+      touchStartX = e.changedTouches[0].clientX;
+      touchStartY = e.changedTouches[0].clientY;
+      var modalInner = document.getElementById('modal-inner');
+      if (modalInner) touchStartScrollTop = modalInner.scrollTop;
+    }, {passive: true});
+
+    document.addEventListener('touchend', function(e) {
+      var touchEndX = e.changedTouches[0].clientX;
+      var touchEndY = e.changedTouches[0].clientY;
+      var diffX = touchEndX - touchStartX;
+      var diffY = touchEndY - touchStartY;
+      
+      var lb = document.getElementById('lightbox');
+      if (lb && lb.style.display !== 'none') {
+        if (imgScale > 1) return;
+        if (diffY > 80 && Math.abs(diffY) > Math.abs(diffX)) { closeLightbox(); }
+        else if (Math.abs(diffY) < 60) {
+          if (diffX < -50) nextImage();
+          if (diffX > 50) prevImage();
+        }
+        return;
+      }
+     
+      var modal = document.getElementById('article-modal');
+      if (modal && modal.style.display !== 'none') {
+        // 在新的 Slide-up 設計中，我們允許使用者往下滑動(diffY > 80)關閉視窗
+        if (diffY > 80 && Math.abs(diffY) > Math.abs(diffX) && touchStartScrollTop <= 0) { closeModal(); return; }
+      }
+    }, {passive: true});
+
+    // 處理 Drive 網址並加上 lh3 直連轉換
+    function formatDriveUrl(url) {
+      if (!url || typeof url !== 'string') return '';
+      if (!url.includes('drive.google.com')) return url;
+      var match = url.match(/\/d\/(.+?)\//) || url.match(/id=(.+?)(&|$)/);
+      if (match && match[1]) {
+        // 利用 lh3 直接渲染圖片，提升載入速度
+        return 'https://lh3.googleusercontent.com/d/' + match[1];
+      }
+      return url;
+    }
+
+    function sortSubCategories(subs) {
+      var orderMap = {
+        '校長室': 1, '家長會長': 2, '教務處': 3, '學務處': 4, '總務處': 5, '輔導室': 6,
+        '忠班': 11, '孝班': 12, '仁班': 13, '愛班': 14, '信班': 15, '義班': 16, '和班': 17,
+        '藍鯨班': 21, '海馬班': 22, '珊瑚班': 23, '海豚班': 24, '星光班': 25,
+      };
+      return subs.sort(function(a, b) {
+        var weightA = 999, weightB = 999;
+        for (var key in orderMap) { if (a.indexOf(key) !== -1) weightA = orderMap[key]; }
+        for (var key in orderMap) { if (b.indexOf(key) !== -1) weightB = orderMap[key]; }
+        if (weightA !== weightB) return weightA - weightB;
+        return a.localeCompare(b, 'zh-TW', { numeric: true });
+      });
+    }
+
+    window.onload = function() {
+   // 請將引號內的網址，替換為您在第一階段複製的 GAS API 網址
+   var API_URL = 'https://script.google.com/macros/s/AKfycbwC8LeMgJ3lVws0PzgY94Opq5S_RsQqW-NGAXFwzgRUAXEcDo-W7L879dQBigHJ91ph/exec'; 
+
+   fetch(API_URL)
+     .then(function(response) {
+       return response.json();
+     })
+     .then(function(data) {
+       initApp(data); 
+     })
+     .catch(function(error) {
+       showError(error); 
+     });
+      
+      // Lightbox 雙擊/縮放手勢綁定
+      var lbImg = document.getElementById('lightbox-img');
+      lbImg.addEventListener('dblclick', function(e) {
+        if (imgScale > 1) resetImageTransform();
+        else {
+          imgScale = 2.5;
+          lbImg.style.transition = 'transform 0.3s ease';
+          lbImg.style.transform = 'translate(0px, 0px) scale(' + imgScale + ')';
+        }
+      });
+      lbImg.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 1) {
+          var currentTime = new Date().getTime();
+          var tapLength = currentTime - lastTouchTime;
+          if (tapLength < 300 && tapLength > 0) {
+            e.preventDefault();
+            if (imgScale > 1) resetImageTransform();
+            else {
+              imgScale = 2.5;
+              lbImg.style.transition = 'transform 0.3s ease';
+              lbImg.style.transform = 'translate(0px, 0px) scale(' + imgScale + ')';
+            }
+          } else {
+            lbImg.style.transition = 'none';
+            lastTouchX = e.touches[0].clientX;
+            lastTouchY = e.touches[0].clientY;
+          }
+          lastTouchTime = currentTime;
+        } else if (e.touches.length === 2) {
+          e.preventDefault();
+          isPinching = true;
+          lbImg.style.transition = 'none';
+          touchStartDistance = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+        }
+      }, {passive: false});
+      lbImg.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 1 && imgScale > 1 && !isPinching) {
+          e.preventDefault();
+          e.stopPropagation();
+          var deltaX = e.touches[0].clientX - lastTouchX;
+          var deltaY = e.touches[0].clientY - lastTouchY;
+          imgTranslateX += deltaX;
+          imgTranslateY += deltaY;
+          lastTouchX = e.touches[0].clientX;
+          lastTouchY = e.touches[0].clientY;
+          lbImg.style.transform = 'translate(' + imgTranslateX + 'px, ' + imgTranslateY + 'px) scale(' + imgScale + ')';
+        } else if (e.touches.length === 2) {
+          e.preventDefault();
+          e.stopPropagation();
+          var currentDistance = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          var scaleChange = currentDistance / touchStartDistance;
+          imgScale = Math.min(Math.max(1, imgScale * scaleChange), 5);
+          touchStartDistance = currentDistance;
+          lbImg.style.transform = 'translate(' + imgTranslateX + 'px, ' + imgTranslateY + 'px) scale(' + imgScale + ')';
+        }
+      }, {passive: false});
+      lbImg.addEventListener('touchend', function(e) {
+        if (e.touches.length < 2) isPinching = false;
+        if (imgScale < 1) resetImageTransform();
+      }, {passive: true});
+    };
+
+    function initApp(articles) {
+      articles.forEach(function(a, idx) { if (!a.id) a.id = 'auto-' + idx; });
+      globalArticles = articles;
+      document.getElementById('splash-loading').style.display = 'none';
+      document.getElementById('btn-start-reading').style.display = 'block';
+      setMainCategory('行政', 'nav-admin');
+    }
+
+    function setMainCategory(mainCat, activeNavId) {
+      currentMainCategory = mainCat;
+      currentSubCategory = '';
+     
+      // 【UI/UX優化】變更導覽列狀態的 Tailwind class
+      document.querySelectorAll('.nav-btn').forEach(function(btn) {
+        if (btn.id === activeNavId) {
+          btn.classList.add('text-morandi-dark', 'md:bg-morandi-light/60');
+          btn.classList.remove('text-gray-400', 'md:hover:bg-gray-100');
+        } else {
+          btn.classList.remove('text-morandi-dark', 'md:bg-morandi-light/60');
+          btn.classList.add('text-gray-400', 'md:hover:bg-gray-100');
+        }
+      });
+
+      var subs = [];
+      globalArticles.forEach(function(a) {
+        if (a.main_category === mainCat && a.sub_category && !subs.includes(a.sub_category)) subs.push(a.sub_category);
+      });
+      subs = sortSubCategories(subs);
+      renderTabs(subs);
+      renderSubCategoryGrid(subs);
+    }
+
+    function setSubCategory(subCat) {
+      currentSubCategory = subCat;
+      var subs = [];
+      globalArticles.forEach(function(a) {
+        if (a.main_category === currentMainCategory && a.sub_category && !subs.includes(a.sub_category)) subs.push(a.sub_category);
+      });
+      subs = sortSubCategories(subs);
+      renderTabs(subs);
+      filterArticles();
+    }
+
+    function renderTabs(categories) {
+      var container = document.getElementById('category-tabs');
+      container.innerHTML = '';
+      if (categories.length === 0) { container.style.display = 'none'; return; }
+      container.style.display = 'flex';
+      categories.forEach(function(cat) {
+        var btn = document.createElement('button');
+        var style = (cat === currentSubCategory)
+          ? 'bg-morandi-dark text-white shadow-md'
+          : 'bg-white text-gray-500 border border-gray-200 hover:bg-morandi-light hover:text-morandi-dark';
+        btn.className = 'filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium tracking-wide transition-colors ' + style;
+        btn.innerText = cat;
+        container.appendChild(btn);
+      });
+    }
+
+    function renderSubCategoryGrid(subs) {
+      var gridContainer = document.getElementById('subcat-grid');
+      var listContainer = document.getElementById('article-list');
+     
+      listContainer.style.display = 'none';
+      gridContainer.style.display = 'grid';
+      gridContainer.innerHTML = '';
+     
+      if (subs.length === 0) {
+        gridContainer.style.display = 'block';
+        gridContainer.innerHTML = '<div class="text-center p-8 bg-cardBg rounded-2xl border border-white mt-12 shadow-sm"><p class="text-gray-500 font-bold text-lg">這個分類目前沒有內容喔！</p></div>';
+        return;
+      }
+
+      subs.forEach(function(sub, index) {
+        var card = document.createElement('div');
+        var colors = ['bg-morandi-taupe', 'bg-morandi-pink', 'bg-morandi-pink', 'bg-morandi-taupe'];
+        var bgClass = colors[index % 4] + ' hover:opacity-90';
+       
+        card.className = 'sub-cat-card backdrop-blur-md rounded-[20px] py-6 px-2 md:py-8 md:px-4 shadow-sm cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center text-center ' + bgClass;
+        
+        // 【資安優化】使用 textContent 防範 XSS 攻擊
+        var h3 = document.createElement('h3');
+        h3.className = 'cat-name text-lg md:text-2xl lg:text-3xl font-bold text-white tracking-wider md:tracking-[0.2em] drop-shadow-sm';
+        h3.textContent = sub;
+        card.appendChild(h3);
+        
+        gridContainer.appendChild(card);
+      });
+    }
+
+    function filterArticles() {
+      var filtered = globalArticles.filter(function(a) { return a.main_category === currentMainCategory; });
+      if (currentSubCategory) {
+        filtered = filtered.filter(function(a) { return a.sub_category === currentSubCategory; });
+      }
+      renderArticles(filtered);
+    }
+
+    function renderArticles(articles) {
+      var gridContainer = document.getElementById('subcat-grid');
+      var listContainer = document.getElementById('article-list');
+     
+      gridContainer.style.display = 'none';
+      listContainer.style.display = 'grid';
+      listContainer.innerHTML = '';
+     
+      if (!articles || articles.length === 0) {
+        listContainer.style.display = 'block';
+        listContainer.innerHTML = '<div class="text-center p-8 bg-cardBg rounded-[20px] mt-12 md:mt-24 shadow-[0_8px_30px_rgba(0,0,0,0.04)]"><p class="text-gray-500 font-bold text-lg">這個分類目前沒有文章喔！</p></div>';
+        return;
+      }
+     
+      articles.forEach(function(article) {
+        var card = document.createElement('div');
+        // 【UI/UX優化】移除邊框，改用無框線的懸浮陰影設計
+        card.className = 'article-card bg-cardBg backdrop-blur-md rounded-[20px] p-5 md:p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95 flex flex-col h-full';
+        card.id = 'article-' + article.id;
+        
+        var allImages = [];
+        var safeCoverUrl = formatDriveUrl(article.cover_image);
+        if (safeCoverUrl) allImages.push(safeCoverUrl);
+        
+        if (article.gallery) {
+          var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
+          var galleryUrls = items.map(function(item) { return formatDriveUrl(item.split('|||')[0]); }).filter(function(u) { return u; });
+          allImages = allImages.concat(galleryUrls);
+        }
+       
+        allImages = allImages.filter(function(item, pos) { return allImages.indexOf(item) == pos; });
+        var contentRow = document.createElement('div');
+        contentRow.className = 'flex justify-between items-start gap-4 mb-2 flex-1';
+        
+        var leftCol = document.createElement('div');
+        leftCol.className = 'flex-1 flex flex-col';
+        var topRow = document.createElement('div');
+        topRow.className = 'mb-3';
+        topRow.innerHTML = '<span class="text-xs font-medium text-morandi-dark bg-morandi-light px-3 py-1.5 rounded-full">' + (article.sub_category || article.main_category || '未分類') + '</span>';
+        leftCol.appendChild(topRow);
+        
+        var title = document.createElement('h2');
+        title.className = 'text-lg md:text-xl font-bold text-gray-800 line-clamp-2 leading-snug';
+        title.innerText = article.title || '無標題';
+        leftCol.appendChild(title);
+        contentRow.appendChild(leftCol);
+        
+        if (allImages.length > 0) {
+          var rightCol = document.createElement('div');
+          rightCol.className = 'relative w-24 h-24 shrink-0';
+          var displayCount = Math.min(allImages.length, 3);
+         
+          for (var i = displayCount - 1; i >= 0; i--) {
+            var imgDiv = document.createElement('div');
+            var offset = i * 5;
+            var rightOffset = (displayCount - 1 - i) * 5;
+            var zIndex = 30 - i * 10;
+           
+            imgDiv.className = 'absolute rounded-xl shadow-md border-[2px] border-white overflow-hidden bg-gray-100';
+            imgDiv.style.width = 'calc(100% - 10px)';
+            imgDiv.style.height = 'calc(100% - 10px)';
+            imgDiv.style.top = offset + 'px';
+            imgDiv.style.right = rightOffset + 'px';
+            imgDiv.style.zIndex = zIndex;
+            
+            var imgTag = document.createElement('img');
+            imgTag.src = allImages[i];
+            imgTag.className = 'w-full h-full object-cover';
+            imgDiv.appendChild(imgTag);
+            
+            if (i === 0 && allImages.length > 1) {
+              var overlay = document.createElement('div');
+              overlay.className = 'absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center';
+              var plusText = document.createElement('span');
+              plusText.className = 'text-white text-sm md:text-base font-bold tracking-wider';
+              plusText.innerText = '+' + (allImages.length - 1);
+              overlay.appendChild(plusText);
+              imgDiv.appendChild(overlay);
+            }
+            rightCol.appendChild(imgDiv);
+          }
+          contentRow.appendChild(rightCol);
+        }
+        card.appendChild(contentRow);
+        
+        var author = document.createElement('p');
+        author.className = 'text-lg md:text-xl font-bold text-morandi-dark text-right mt-4 border-t border-gray-200/60 pt-4 shrink-0';
+        author.innerText = article.author || '';
+        card.appendChild(author);
+       
+        listContainer.appendChild(card);
+      });
+    }
+
+    function openModal(articleId) {
+      var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); });
+      if(!article) return;
+      
+      var imgContainer = document.getElementById('modal-image-container');
+      var imgElement = document.getElementById('modal-cover');
+      var headerPadding = document.getElementById('modal-header-padding');
+      var safeCoverUrl = formatDriveUrl(article.cover_image);
+     
+      if (safeCoverUrl) {
+        imgElement.src = safeCoverUrl;
+        imgContainer.style.display = 'block';
+        headerPadding.classList.remove('mt-12');
+      } else {
+        imgContainer.style.display = 'none';
+        headerPadding.classList.add('mt-12');
+      }
+      
+      document.getElementById('modal-category').innerText = article.sub_category || article.main_category || '未分類';
+      document.getElementById('modal-title').innerText = article.title || '無標題';
+      document.getElementById('modal-author').innerText = article.author || '';
+      document.getElementById('modal-date').innerText = article.publish_date || '';
+      document.getElementById('modal-content').innerText = article.content || '';
+      
+      var galleryContainer = document.getElementById('modal-gallery');
+      galleryContainer.innerHTML = '';
+      currentGalleryData = [];
+     
+      if (article.gallery) {
+        var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
+        items.forEach(function(item, index) {
+          var parts = item.split('|||');
+          var rawUrl = parts[0];
+          var captionText = parts.length > 1 ? parts[1] : '';
+          var safeUrl = formatDriveUrl(rawUrl);
+         
+          if (safeUrl) {
+            currentGalleryData.push({ url: safeUrl, caption: captionText });
+            var gDiv = document.createElement('div');
+            gDiv.className = 'gallery-thumb w-full aspect-square bg-gray-200 overflow-hidden cursor-pointer rounded-lg hover:ring-2 hover:ring-morandi-taupe transition-all';
+            gDiv.id = 'thumb-' + index;
+            var gImg = document.createElement('img');
+            gImg.src = safeUrl;
+            gImg.className = 'w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity';
+            gDiv.appendChild(gImg);
+            galleryContainer.appendChild(gDiv);
+          }
+        });
+      }
+      
+      var modal = document.getElementById('article-modal');
+      modal.style.display = 'flex';
+      document.body.classList.add('modal-open');
+      
+      // 【UI/UX優化】Slide-up 向上滑出動畫
+      setTimeout(function() {
+        modal.classList.remove('translate-y-full'); // 移除手機版的向下位移
+        modal.classList.remove('md:translate-x-full'); // 移除桌機版的向右位移
+        modal.classList.remove('md:opacity-0');
+      }, 10);
+     
+      var modalInner = document.getElementById('modal-inner');
+      if (modalInner) modalInner.scrollTop = 0;
+    }
+
+    function closeModal() {
+      var modal = document.getElementById('article-modal');
+      // 【UI/UX優化】恢復位移，讓視窗滑出
+      modal.classList.add('translate-y-full');
+      modal.classList.add('md:translate-x-full');
+      modal.classList.add('md:opacity-0');
+      
+      setTimeout(function() {
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+      }, 300);
+    }
+   
+    function openLightbox(index) {
+      if(currentGalleryData.length === 0) return;
+      currentLightboxIndex = index;
+     
+      var tbContainer = document.getElementById('lightbox-thumbnails');
+      tbContainer.innerHTML = '';
+      currentGalleryData.forEach(function(data, i) {
+        var img = document.createElement('img');
+        img.src = data.url;
+        img.id = 'lb-thumb-' + i;
+        img.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
+        tbContainer.appendChild(img);
+      });
+      updateLightboxImage();
+     
+      var lb = document.getElementById('lightbox');
+      var lbImg = document.getElementById('lightbox-img');
+      lb.style.display = 'flex';
+      setTimeout(function() {
+        lb.classList.remove('opacity-0');
+        lbImg.style.transition = 'transform 0.3s ease';
+        lbImg.style.transform = 'scale(1)';
+      }, 10);
+    }
+
+    function closeLightbox() {
+      var lb = document.getElementById('lightbox');
+      var lbImg = document.getElementById('lightbox-img');
+     
+      resetImageTransform();
+      lb.classList.add('opacity-0');
+      lbImg.style.transition = 'transform 0.3s ease';
+      lbImg.style.transform = 'scale(0.95)';
+      setTimeout(function() { lb.style.display = 'none'; }, 300);
+    }
+   
+    function updateLightboxImage() {
+      resetImageTransform();
+      var img = document.getElementById('lightbox-img');
+      var captionEl = document.getElementById('lightbox-caption-text');
+      var currentData = currentGalleryData[currentLightboxIndex];
+      img.style.transition = 'transform 0.1s ease';
+      img.style.transform = 'scale(0.95)';
+      img.src = currentData.url;
+     
+      if (currentData.caption) {
+        captionEl.innerText = currentData.caption;
+        captionEl.style.display = 'inline-block';
+      } else {
+        captionEl.style.display = 'none';
+      }
+      
+      setTimeout(function() {
+        img.style.transition = 'transform 0.3s ease';
+        img.style.transform = 'scale(1)';
+      }, 50);
+      
+      document.getElementById('lightbox-counter').innerText = (currentLightboxIndex + 1) + ' / ' + currentGalleryData.length;
+      
+      currentGalleryData.forEach(function(_, i) {
+        var thumb = document.getElementById('lb-thumb-' + i);
+        if(thumb) {
+          if (i === currentLightboxIndex) {
+            thumb.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-100 ring-2 ring-white scale-110';
+            thumb.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
+          } else {
+            thumb.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
+          }
+        }
+      });
+    }
+   
+    function prevImage() { if (currentLightboxIndex > 0) { currentLightboxIndex--; updateLightboxImage(); } }
+    function nextImage() { if (currentLightboxIndex < currentGalleryData.length - 1) { currentLightboxIndex++; updateLightboxImage(); } }
+    
+    function showError(error) { 
+      document.getElementById('splash-loading').innerHTML = '<p class="text-red-500 font-bold text-center">載入失敗<br>請重新整理</p>'; 
+    }
+  </script>
+</body>
+</html>
