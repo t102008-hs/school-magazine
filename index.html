@@ -492,6 +492,7 @@
             var imgTag = document.createElement('img');
             imgTag.src = allImages[i];
             imgTag.className = 'w-full h-full object-cover';
+            imgTag.setAttribute('loading', 'lazy');
             imgDiv.appendChild(imgTag);
             if (i === 0 && allImages.length > 1) {
               var overlay = document.createElement('div');
@@ -554,6 +555,7 @@
             var gImg = document.createElement('img');
             gImg.src = safeUrl;
             gImg.className = 'w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity';
+            gImg.setAttribute('loading', 'lazy');
             gDiv.appendChild(gImg);
             galleryContainer.appendChild(gDiv);
           }
