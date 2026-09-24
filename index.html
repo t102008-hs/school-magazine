@@ -275,15 +275,19 @@ document.addEventListener('touchend', function(e) {
       }
     }, {passive: true});
 
-    function formatDriveUrl(url) {
-      if (!url || typeof url !== 'string') return '';
-      if (!url.includes('drive.google.com')) return url;
-      var match = url.match(/\/d\/(.+?)\//) || url.match(/id=(.+?)(&|$)/);
-      if (match && match[1]) {
-        return 'https://lh3.googleusercontent.com/d/' + match[1];
-      }
-      return url;
-    }
+// 增加 size 參數，預設為 s800 (寬/高最大 800px)
+function formatDriveUrl(url, size) {
+  if (!url || typeof url !== 'string') return '';
+  if (!url.includes('drive.google.com')) return url;
+  
+  var sizeParam = size ? '=' + size : '=s800'; // 預設做 800px 縮圖
+  var match = url.match(/\/d\/(.+?)\//) || url.match(/id=(.+?)(&|$)/);
+  
+  if (match && match[1]) {
+    return 'https://lh3.googleusercontent.com/d/' + match[1] + sizeParam;
+  }
+  return url;
+}
 
     function sortSubCategories(subs) {
       var orderMap = {
@@ -489,7 +493,8 @@ function renderTabs(categories) {
         card.className = 'article-card bg-cardBg backdrop-blur-md rounded-[20px] p-5 md:p-6 shadow-[0_8px_30px_rgba(0,0,0,0.04)] cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95 flex flex-col h-full';
         card.id = 'article-' + article.id;
         var allImages = [];
-        var safeCoverUrl = formatDriveUrl(article.cover_image);
+        // 修改 renderArticles 裡面的 formatDriveUrl 調用：
+        var safeCoverUrl = formatDriveUrl(article.cover_image, 's400');
         if (safeCoverUrl) allImages.push(safeCoverUrl);
         if (article.gallery) {
           var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
@@ -558,7 +563,8 @@ function renderTabs(categories) {
       var imgContainer = document.getElementById('modal-image-container');
       var imgElement = document.getElementById('modal-cover');
       var headerPadding = document.getElementById('modal-header-padding');
-      var safeCoverUrl = formatDriveUrl(article.cover_image);
+      // 修改 openModal 裡面的 formatDriveUrl 調用：
+      var safeCoverUrl = formatDriveUrl(article.cover_image, 's1000');
       if (safeCoverUrl) {
         imgElement.src = safeCoverUrl;
         imgContainer.style.display = 'block';
@@ -628,7 +634,7 @@ function renderTabs(categories) {
       tbContainer.innerHTML = '';
       currentGalleryData.forEach(function(data, i) {
         var img = document.createElement('img');
-        img.src = data.url;
+        img.src = formatDriveUrl(currentData.rawUrl, 's2000');
         img.id = 'lb-thumb-' + i;
         img.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
         tbContainer.appendChild(img);
