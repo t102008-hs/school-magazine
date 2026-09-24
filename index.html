@@ -305,7 +305,7 @@ document.addEventListener('touchend', function(e) {
     window.onload = function() {
       var API_URL = 'https://script.google.com/macros/s/AKfycbwC8LeMgJ3lVws0PzgY94Opq5S_RsQqW-NGAXFwzgRUAXEcDo-W7L879dQBigHJ91ph/exec'; 
       
-      fetch(API_URL)
+      fetch('./articles.json')
         .then(function(response) { return response.json(); })
         .then(function(data) { initApp(data); })
         .catch(function(error) { showError(error); });
