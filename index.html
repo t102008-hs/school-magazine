@@ -276,18 +276,16 @@ document.addEventListener('touchend', function(e) {
     }, {passive: true});
 
 // 增加 size 參數，預設為 s800 (寬/高最大 800px)
-function formatDriveUrl(url, size) {
-  if (!url || typeof url !== 'string') return '';
-  if (!url.includes('drive.google.com')) return url;
-  
-  var sizeParam = size ? '=' + size : '=s800'; // 預設做 800px 縮圖
-  var match = url.match(/\/d\/(.+?)\//) || url.match(/id=(.+?)(&|$)/);
-  
-  if (match && match[1]) {
-    return 'https://lh3.googleusercontent.com/d/' + match[1] + sizeParam;
-  }
-  return url;
-}
+    function formatDriveUrl(url, size) {
+      if (!url || typeof url !== 'string') return '';
+      if (!url.includes('drive.google.com')) return url;
+      var sizeParam = size ? '=' + size : '=s800'; // 預設做 800px 縮圖
+      var match = url.match(/\/d\/(.+?)\//) || url.match(/id=(.+?)(&|$)/);
+      if (match && match[1]) {
+        return 'https://lh3.googleusercontent.com/d/' + match[1] + sizeParam;
+      }
+      return url;
+    }
 
     function sortSubCategories(subs) {
       var orderMap = {
@@ -558,63 +556,69 @@ function renderTabs(categories) {
     }
 
     function openModal(articleId) {
-      var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); });
-      if(!article) return;
-      var imgContainer = document.getElementById('modal-image-container');
-      var imgElement = document.getElementById('modal-cover');
-      var headerPadding = document.getElementById('modal-header-padding');
-      // 修改 openModal 裡面的 formatDriveUrl 調用：
-      var safeCoverUrl = formatDriveUrl(article.cover_image, 's1000');
-      if (safeCoverUrl) {
-        imgElement.src = safeCoverUrl;
-        imgContainer.style.display = 'block';
-        headerPadding.classList.remove('mt-12');
-      } else {
-        imgContainer.style.display = 'none';
-        headerPadding.classList.add('mt-12');
-      }
-      document.getElementById('modal-category').innerText = article.sub_category || article.main_category || '未分類';
-      document.getElementById('modal-title').innerText = article.title || '無標題';
-      document.getElementById('modal-author').innerText = article.author || '';
-      document.getElementById('modal-date').innerText = article.publish_date || '';
-      document.getElementById('modal-content').innerText = article.content || '';
+  var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); });
+  if(!article) return;
+  var imgContainer = document.getElementById('modal-image-container');
+  var imgElement = document.getElementById('modal-cover');
+  var headerPadding = document.getElementById('modal-header-padding');
+  var safeCoverUrl = formatDriveUrl(article.cover_image, 's1000'); // 封面用 1000px
+  
+  if (safeCoverUrl) {
+    imgElement.src = safeCoverUrl;
+    imgContainer.style.display = 'block';
+    headerPadding.classList.remove('mt-12');
+  } else {
+    imgContainer.style.display = 'none';
+    headerPadding.classList.add('mt-12');
+  }
+  
+  document.getElementById('modal-category').innerText = article.sub_category || article.main_category || '未分類';
+  document.getElementById('modal-title').innerText = article.title || '無標題';
+  document.getElementById('modal-author').innerText = article.author || '';
+  document.getElementById('modal-date').innerText = article.publish_date || '';
+  document.getElementById('modal-content').innerText = article.content || '';
+  
+  var galleryContainer = document.getElementById('modal-gallery');
+  galleryContainer.innerHTML = '';
+  currentGalleryData = [];
+  
+  if (article.gallery) {
+    var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
+    items.forEach(function(item, index) {
+      var parts = item.split('|||');
+      var rawUrl = parts[0];
+      var captionText = parts.length > 1 ? parts[1] : '';
+      var safeUrl = formatDriveUrl(rawUrl, 's400'); // 畫廊小縮圖用 400px，載入超快
       
-      var galleryContainer = document.getElementById('modal-gallery');
-      galleryContainer.innerHTML = '';
-      currentGalleryData = [];
-      if (article.gallery) {
-        var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
-        items.forEach(function(item, index) {
-          var parts = item.split('|||');
-          var rawUrl = parts[0];
-          var captionText = parts.length > 1 ? parts[1] : '';
-          var safeUrl = formatDriveUrl(rawUrl);
-          if (safeUrl) {
-            currentGalleryData.push({ url: safeUrl, caption: captionText });
-            var gDiv = document.createElement('div');
-            gDiv.className = 'gallery-thumb w-full aspect-square bg-gray-200 overflow-hidden cursor-pointer rounded-lg hover:ring-2 hover:ring-morandi-taupe transition-all';
-            gDiv.id = 'thumb-' + index;
-            var gImg = document.createElement('img');
-            gImg.src = safeUrl;
-            gImg.className = 'w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity';
-            gImg.setAttribute('loading', 'lazy');
-            gDiv.appendChild(gImg);
-            galleryContainer.appendChild(gDiv);
-          }
-        });
+      if (safeUrl) {
+        // 同時紀錄小圖 safeUrl 與原始網址 rawUrl
+        currentGalleryData.push({ url: safeUrl, caption: captionText, rawUrl: rawUrl });
+        
+        var gDiv = document.createElement('div');
+        gDiv.className = 'gallery-thumb w-full aspect-square bg-gray-200 overflow-hidden cursor-pointer rounded-lg hover:ring-2 hover:ring-morandi-taupe transition-all';
+        gDiv.id = 'thumb-' + index;
+        var gImg = document.createElement('img');
+        gImg.src = safeUrl;
+        gImg.className = 'w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity';
+        gImg.setAttribute('loading', 'lazy');
+        gDiv.appendChild(gImg);
+        galleryContainer.appendChild(gDiv);
       }
-      var modal = document.getElementById('article-modal');
-      modal.style.display = 'flex';
-      document.body.classList.add('modal-open');
-      setTimeout(function() {
-        modal.classList.remove('translate-y-full');
-        modal.classList.remove('md:translate-x-full');
-        modal.classList.remove('md:opacity-0');
-      }, 10);
-      
-      var scrollContent = document.getElementById('modal-scroll-content');
-      if (scrollContent) scrollContent.scrollTop = 0;
-    }
+    });
+  }
+  
+  var modal = document.getElementById('article-modal');
+  modal.style.display = 'flex';
+  document.body.classList.add('modal-open');
+  setTimeout(function() {
+    modal.classList.remove('translate-y-full');
+    modal.classList.remove('md:translate-x-full');
+    modal.classList.remove('md:opacity-0');
+  }, 10);
+  
+  var scrollContent = document.getElementById('modal-scroll-content');
+  if (scrollContent) scrollContent.scrollTop = 0;
+}
 
     function closeModal() {
       var modal = document.getElementById('article-modal');
@@ -628,28 +632,31 @@ function renderTabs(categories) {
     }
    
     function openLightbox(index) {
-      if(currentGalleryData.length === 0) return;
-      currentLightboxIndex = index;
-      var tbContainer = document.getElementById('lightbox-thumbnails');
-      tbContainer.innerHTML = '';
-      currentGalleryData.forEach(function(data, i) {
-        var img = document.createElement('img');
-        img.src = formatDriveUrl(currentData.rawUrl, 's2000');
-        img.id = 'lb-thumb-' + i;
-        img.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
-        tbContainer.appendChild(img);
-      });
-      updateLightboxImage();
-      var lb = document.getElementById('lightbox');
-      var lbImg = document.getElementById('lightbox-img');
-      lb.style.display = 'flex';
-      setTimeout(function() {
-        lb.classList.remove('opacity-0');
-        lbImg.style.transition = 'transform 0.3s ease';
-        lbImg.style.transform = 'scale(1)';
-      }, 10);
-    }
-
+  if(currentGalleryData.length === 0) return;
+  currentLightboxIndex = index;
+  var tbContainer = document.getElementById('lightbox-thumbnails');
+  tbContainer.innerHTML = '';
+  
+  // 修正：這裡的參數是 item，使用 item.url 產生底部縮圖
+  currentGalleryData.forEach(function(item, i) {
+    var img = document.createElement('img');
+    img.src = item.url;
+    img.id = 'lb-thumb-' + i;
+    img.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
+    tbContainer.appendChild(img);
+  });
+  
+  updateLightboxImage();
+  var lb = document.getElementById('lightbox');
+  var lbImg = document.getElementById('lightbox-img');
+  lb.style.display = 'flex';
+  setTimeout(function() {
+    lb.classList.remove('opacity-0');
+    lbImg.style.transition = 'transform 0.3s ease';
+    lbImg.style.transform = 'scale(1)';
+  }, 10);
+}
+    
     function closeLightbox() {
       var lb = document.getElementById('lightbox');
       var lbImg = document.getElementById('lightbox-img');
@@ -660,37 +667,46 @@ function renderTabs(categories) {
       setTimeout(function() { lb.style.display = 'none'; }, 300);
     }
    
-    function updateLightboxImage() {
-      resetImageTransform();
-      var img = document.getElementById('lightbox-img');
-      var captionEl = document.getElementById('lightbox-caption-text');
-      var currentData = currentGalleryData[currentLightboxIndex];
-      img.style.transition = 'transform 0.1s ease';
-      img.style.transform = 'scale(0.95)';
-      img.src = currentData.url;
-      if (currentData.caption) {
-        captionEl.innerText = currentData.caption;
-        captionEl.style.display = 'inline-block';
+function updateLightboxImage() {
+  resetImageTransform();
+  var img = document.getElementById('lightbox-img');
+  var captionEl = document.getElementById('lightbox-caption-text');
+  
+  // currentData 在這裡定義
+  var currentData = currentGalleryData[currentLightboxIndex];
+  
+  img.style.transition = 'transform 0.1s ease';
+  img.style.transform = 'scale(0.95)';
+  
+  // 只有在彈出全螢幕大圖時，才請求高解析度 (2000px) 的照片
+  img.src = formatDriveUrl(currentData.rawUrl || currentData.url, 's2000');
+  
+  if (currentData.caption) {
+    captionEl.innerText = currentData.caption;
+    captionEl.style.display = 'inline-block';
+  } else {
+    captionEl.style.display = 'none';
+  }
+  
+  setTimeout(function() {
+    img.style.transition = 'transform 0.3s ease';
+    img.style.transform = 'scale(1)';
+  }, 50);
+  
+  document.getElementById('lightbox-counter').innerText = (currentLightboxIndex + 1) + ' / ' + currentGalleryData.length;
+  
+  currentGalleryData.forEach(function(_, i) {
+    var thumb = document.getElementById('lb-thumb-' + i);
+    if(thumb) {
+      if (i === currentLightboxIndex) {
+        thumb.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-100 ring-2 ring-white scale-110';
+        thumb.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
       } else {
-        captionEl.style.display = 'none';
+        thumb.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
       }
-      setTimeout(function() {
-        img.style.transition = 'transform 0.3s ease';
-        img.style.transform = 'scale(1)';
-      }, 50);
-      document.getElementById('lightbox-counter').innerText = (currentLightboxIndex + 1) + ' / ' + currentGalleryData.length;
-      currentGalleryData.forEach(function(_, i) {
-        var thumb = document.getElementById('lb-thumb-' + i);
-        if(thumb) {
-          if (i === currentLightboxIndex) {
-            thumb.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-100 ring-2 ring-white scale-110';
-            thumb.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
-          } else {
-            thumb.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
-          }
-        }
-      });
     }
+  });
+}
    
     function prevImage() { if (currentLightboxIndex > 0) { currentLightboxIndex--; updateLightboxImage(); } }
     function nextImage() { if (currentLightboxIndex < currentGalleryData.length - 1) { currentLightboxIndex++; updateLightboxImage(); } }
