@@ -126,15 +126,21 @@
     </div>
   </div>
   
-  <!-- ================= 5. Lightbox 圖片放大 ================= -->
-  <div id="lightbox" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center opacity-0 transition-opacity duration-300 touch-none" style="display:none;">
-    <button id="btn-close-lightbox" class="absolute top-6 right-6 text-white p-3 z-20 bg-black/30 rounded-full hover:bg-white/20 transition active:scale-90"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-    <div id="lightbox-counter" class="absolute top-8 left-6 text-white/70 font-bold z-20 text-sm tracking-widest drop-shadow-md"></div>
-    <button id="btn-prev-img" class="absolute left-4 text-white p-4 z-20 opacity-50 hover:opacity-100 hidden md:block bg-black/30 rounded-full transition"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
-    <button id="btn-next-img" class="absolute right-4 text-white p-4 z-20 opacity-50 hover:opacity-100 hidden md:block bg-black/30 rounded-full transition"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
-    <div class="w-full h-full flex items-center justify-center overflow-hidden pb-32 px-4 pt-16"><img id="lightbox-img" src="" draggable="false" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl select-none pointer-events-auto" style="transform: scale(0.95); transition: transform 0.3s ease;"></div>
-    <div id="lightbox-caption" class="absolute bottom-[100px] w-full flex justify-center px-4 z-20 pointer-events-none"><span class="inline-block bg-black/40 backdrop-blur-md text-white/95 text-sm md:text-base font-medium tracking-widest px-5 py-2 rounded-full shadow-sm border border-white/20 transition-opacity duration-300" id="lightbox-caption-text"></span></div>
-    <div id="lightbox-thumbnails" class="absolute bottom-6 w-full flex justify-center space-x-2 px-4 overflow-x-auto hide-scroll-x z-20"></div>
+<!-- ================= 5. Lightbox 圖片與影片全螢幕放大 ================= -->
+  <div id="lightbox" class="fixed inset-0 z-[70] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center opacity-0 transition-opacity duration-300 touch-none" style="display:none;">
+    <button id="btn-close-lightbox" class="absolute top-6 right-6 text-white p-3 z-30 bg-white/10 rounded-full hover:bg-white/20 transition active:scale-90"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <div id="lightbox-counter" class="absolute top-8 left-6 text-white/70 font-bold z-30 text-sm tracking-widest drop-shadow-md"></div>
+    <button id="btn-prev-img" class="absolute left-4 text-white p-4 z-30 opacity-50 hover:opacity-100 hidden md:block bg-white/10 rounded-full transition"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+    <button id="btn-next-img" class="absolute right-4 text-white p-4 z-30 opacity-50 hover:opacity-100 hidden md:block bg-white/10 rounded-full transition"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+    
+    <!-- 主顯示區：自動切換顯示圖片或 16:9 影片播放器 -->
+    <div class="w-full h-full flex items-center justify-center overflow-hidden pb-32 px-4 pt-20">
+      <img id="lightbox-img" src="" draggable="false" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl select-none pointer-events-auto" style="transform: scale(0.95); transition: transform 0.3s ease;">
+      <div id="lightbox-video-box" class="relative w-full max-w-4xl aspect-video max-h-[65vh] rounded-2xl overflow-hidden shadow-2xl bg-black pointer-events-auto" style="display:none;"></div>
+    </div>
+    
+    <div id="lightbox-caption" class="absolute bottom-[100px] w-full flex justify-center px-4 z-30 pointer-events-none"><span class="inline-block bg-black/40 backdrop-blur-md text-white/95 text-sm md:text-base font-medium tracking-widest px-5 py-2 rounded-full shadow-sm border border-white/20 transition-opacity duration-300" id="lightbox-caption-text"></span></div>
+    <div id="lightbox-thumbnails" class="absolute bottom-6 w-full flex justify-center space-x-2 px-4 overflow-x-auto hide-scroll-x z-30"></div>
   </div>
 
   <script>
@@ -492,7 +498,7 @@
       });
     }
 
-    // ★ 彈窗支援獨立影片播放器與相簿分流呈現
+// ★ 升級版：所有照片與影片統一顯示為底部小方框，點擊後進入全螢幕燈箱
     function openModal(articleId) {
       var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); 
       if(!article) return;
@@ -506,58 +512,39 @@
       document.getElementById('modal-date').innerText = article.publish_date || '';
       document.getElementById('modal-content').innerText = article.content || '';
       
-      var videos = [];
-      var images = [];
+      // 確保舊的內嵌影片區隱藏
+      var videoContainer = document.getElementById('modal-videos');
+      if (videoContainer) { videoContainer.innerHTML = ''; videoContainer.style.display = 'none'; }
+
+      var mediaItems = [];
       if (article.gallery) {
         var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
         items.forEach(function(item) {
           var parsed = parseMediaItem(item);
-          if (parsed) {
-            if (parsed.type === 'youtube' || parsed.type === 'drive_video') videos.push(parsed);
-            else images.push(parsed);
-          }
+          if (parsed) mediaItems.push(parsed);
         });
       }
       
-// ★ 升級版：限制最大高度確保完整顯示在彈窗內，並封鎖/隱藏 Drive 右上角跳轉按鈕
-      var videoContainer = document.getElementById('modal-videos');
-      videoContainer.innerHTML = '';
-      if (videos.length > 0) {
-        videoContainer.style.display = 'block';
-        videos.forEach(function(v) {
-          var vWrapper = document.createElement('div');
-          // 透過 max-h-[52vh] 與 mx-auto 讓影片自動依高度等比例縮放並置中，絕不超出彈窗
-          vWrapper.className = 'relative w-full max-w-2xl max-h-[52vh] aspect-video mx-auto rounded-2xl overflow-hidden shadow-md bg-black border border-gray-100';
-          
-          // 若是 Google Drive 影片，加入 sandbox 徹底禁止跳轉新視窗，並在右上角加上遮罩擋住該圖示
-          if (v.type === 'drive_video') {
-            vWrapper.innerHTML = 
-              '<iframe src="' + v.embedUrl + '" class="w-full h-full" frameborder="0" sandbox="allow-scripts allow-same-origin" allowfullscreen></iframe>' +
-              '<div class="absolute top-0 right-0 w-14 h-14 z-10 cursor-default" title=""></div>';
-          } else {
-            // YouTube 影片維持正常嵌入
-            vWrapper.innerHTML = '<iframe src="' + v.embedUrl + '" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-          }
-          
-          videoContainer.appendChild(vWrapper);
-        });
-      } else {
-        videoContainer.style.display = 'none';
-      }
-
-      // 渲染底部照片畫廊 (可點擊進入 Lightbox 放大)
-      currentGalleryData = images.map(function(img) { return { url: img.url, caption: img.caption }; });
+      // 將所有媒體（包含照片與影片）存入燈箱佇列
+      currentGalleryData = mediaItems;
       var galleryContainer = document.getElementById('modal-gallery');
       galleryContainer.innerHTML = '';
       
-      for (var i = 0; i < images.length; i++) {
+      for (var i = 0; i < mediaItems.length; i++) {
+          var m = mediaItems[i];
           var gDiv = document.createElement('div');
-          gDiv.className = 'gallery-thumb w-full aspect-square bg-gray-100 overflow-hidden cursor-pointer rounded-xl hover:ring-2 hover:ring-morandi-taupe transition-all';
+          gDiv.className = 'gallery-thumb relative w-full aspect-square bg-gray-900 overflow-hidden cursor-pointer rounded-xl hover:ring-2 hover:ring-morandi-taupe transition-all flex items-center justify-center';
           gDiv.id = 'thumb-' + i;
-          var gImg = document.createElement('img');
-          gImg.src = images[i].thumbUrl; 
-          gImg.className = 'w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity';
-          gDiv.appendChild(gImg); 
+          
+          var innerHtml = '';
+          if (m.thumbUrl) {
+              innerHtml += '<img src="' + m.thumbUrl + '" class="w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity" onerror="this.style.display=\'none\'">';
+          }
+          // 若為影片，在小方框中央加上精緻的播放圖示
+          if (m.type === 'youtube' || m.type === 'drive_video') {
+              innerHtml += '<div class="absolute inset-0 bg-black/30 flex items-center justify-center transition-transform hover:scale-105"><div class="w-10 h-10 rounded-full bg-white/90 text-morandi-dark flex items-center justify-center shadow-md"><svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>';
+          }
+          gDiv.innerHTML = innerHtml;
           galleryContainer.appendChild(gDiv);
       }
       
@@ -572,7 +559,6 @@
       if (modalInner) modalInner.scrollTop = 0;
     }
 
-    // ★ 關閉彈窗時自動停止影片播放 (避免背景繼續發出聲音)
     function closeModal() {
       var modal = document.getElementById('article-modal'); 
       modal.classList.add('translate-x-full'); 
@@ -580,11 +566,6 @@
       setTimeout(function() { 
         modal.style.display = 'none'; 
         document.body.classList.remove('modal-open'); 
-        var videoContainer = document.getElementById('modal-videos');
-        if (videoContainer) {
-          videoContainer.innerHTML = ''; 
-          videoContainer.style.display = 'none';
-        }
       }, 300);
     }
    
@@ -593,61 +574,95 @@
       currentLightboxIndex = index;
       var tbContainer = document.getElementById('lightbox-thumbnails'); 
       tbContainer.innerHTML = '';
+      
       currentGalleryData.forEach(function(data, i) {
-        var img = document.createElement('img'); 
-        img.src = data.url; 
-        img.id = 'lb-thumb-' + i;
-        img.className = 'w-12 h-12 rounded-lg object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
-        tbContainer.appendChild(img);
+        var thumbWrapper = document.createElement('div');
+        thumbWrapper.id = 'lb-thumb-' + i;
+        thumbWrapper.className = 'relative w-12 h-12 rounded-lg overflow-hidden transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50 bg-gray-800 flex items-center justify-center';
+        
+        var html = '';
+        if (data.thumbUrl) {
+          html += '<img src="' + data.thumbUrl + '" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
+        }
+        if (data.type === 'youtube' || data.type === 'drive_video') {
+          html += '<div class="absolute inset-0 bg-black/40 flex items-center justify-center text-white"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
+        }
+        thumbWrapper.innerHTML = html;
+        tbContainer.appendChild(thumbWrapper);
       });
+      
       updateLightboxImage();
       var lb = document.getElementById('lightbox'); 
-      var lbImg = document.getElementById('lightbox-img');
       lb.style.display = 'flex'; 
-      setTimeout(function() { 
-        lb.classList.remove('opacity-0'); 
-        lbImg.style.transition = 'transform 0.3s ease'; 
-        lbImg.style.transform = 'scale(1)'; 
-      }, 10);
+      setTimeout(function() { lb.classList.remove('opacity-0'); }, 10);
     }
 
+    // ★ 關閉全螢幕燈箱時，自動清空影片容器切斷聲音，退回原本的小方框
     function closeLightbox() {
       var lb = document.getElementById('lightbox'); 
       var lbImg = document.getElementById('lightbox-img');
+      var videoBox = document.getElementById('lightbox-video-box');
       resetImageTransform(); 
       lb.classList.add('opacity-0'); 
-      lbImg.style.transition = 'transform 0.3s ease'; 
-      lbImg.style.transform = 'scale(0.95)';
-      setTimeout(function() { lb.style.display = 'none'; }, 300);
+      if (lbImg) { lbImg.style.transition = 'transform 0.3s ease'; lbImg.style.transform = 'scale(0.95)'; }
+      setTimeout(function() { 
+        lb.style.display = 'none'; 
+        if (videoBox) { videoBox.innerHTML = ''; videoBox.style.display = 'none'; }
+      }, 300);
     }
    
+    // ★ 支援在全螢幕燈箱中無縫切換「圖片」與「影片」，並以純黑遮罩徹底隱藏 Drive 右上角跳轉圖示
     function updateLightboxImage() {
       resetImageTransform(); 
       var img = document.getElementById('lightbox-img'); 
+      var videoBox = document.getElementById('lightbox-video-box');
       var captionEl = document.getElementById('lightbox-caption-text');
       var currentData = currentGalleryData[currentLightboxIndex];
-      img.style.transition = 'transform 0.1s ease'; 
-      img.style.transform = 'scale(0.95)'; 
-      img.src = currentData.url;
+      
+      // 切換項目時，先清空上一個影片確保聲音停止
+      if (videoBox) videoBox.innerHTML = '';
+
+      if (currentData.type === 'youtube' || currentData.type === 'drive_video') {
+        img.style.display = 'none';
+        videoBox.style.display = 'block';
+        if (currentData.type === 'drive_video') {
+          // Google Drive 影片：加上 sandbox 禁止彈出視窗，並在右上角疊上純黑方塊 (bg-black) 將跳轉圖示完全隱形
+          videoBox.innerHTML = 
+            '<iframe src="' + currentData.embedUrl + '" class="w-full h-full border-0" sandbox="allow-scripts allow-same-origin" allow="autoplay; fullscreen" allowfullscreen></iframe>' +
+            '<div class="absolute top-0 right-0 w-16 h-14 bg-black z-20 pointer-events-auto select-none"></div>';
+        } else {
+          // YouTube 影片
+          videoBox.innerHTML = 
+            '<iframe src="' + currentData.embedUrl + '" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>';
+        }
+      } else {
+        if (videoBox) videoBox.style.display = 'none';
+        img.style.display = 'block';
+        img.style.transition = 'transform 0.1s ease'; 
+        img.style.transform = 'scale(0.95)'; 
+        img.src = currentData.url;
+        setTimeout(function() { 
+          img.style.transition = 'transform 0.3s ease'; 
+          img.style.transform = 'scale(1)'; 
+        }, 50);
+      }
+
       if (currentData.caption) { 
         captionEl.innerText = currentData.caption; 
         captionEl.style.display = 'inline-block'; 
       } else { 
         captionEl.style.display = 'none'; 
       }
-      setTimeout(function() { 
-        img.style.transition = 'transform 0.3s ease'; 
-        img.style.transform = 'scale(1)'; 
-      }, 50);
+      
       document.getElementById('lightbox-counter').innerText = (currentLightboxIndex + 1) + ' / ' + currentGalleryData.length;
       currentGalleryData.forEach(function(_, i) {
         var thumb = document.getElementById('lb-thumb-' + i);
         if(thumb) {
           if (i === currentLightboxIndex) { 
-            thumb.className = 'w-12 h-12 rounded-lg object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-100 ring-2 ring-white scale-110'; 
+            thumb.className = 'relative w-12 h-12 rounded-lg overflow-hidden transition-all duration-300 cursor-pointer flex-shrink-0 opacity-100 ring-2 ring-white scale-110 bg-gray-800 flex items-center justify-center'; 
             thumb.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'}); 
           } else { 
-            thumb.className = 'w-12 h-12 rounded-lg object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50'; 
+            thumb.className = 'relative w-12 h-12 rounded-lg overflow-hidden transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50 bg-gray-800 flex items-center justify-center'; 
           }
         }
       });
