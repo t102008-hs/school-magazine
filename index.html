@@ -3,10 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>香山國小116週年校刊</title>
-  
-  <link rel="icon" href="./logo.png">
-
+  <title>香山國小116周年校刊</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -33,13 +30,13 @@
     body.modal-open { overflow: hidden; }
   </style>
 </head>
-<!-- 【排版修復】改用標準 flex-col，並透過 order 控制順序，徹底消滅 Chrome 留白 Bug -->
-<body class="bg-milktea text-gray-800 font-sans h-[100dvh] w-full overflow-hidden flex flex-col md:flex-row relative">
-
+<body class="bg-milktea min-h-screen text-gray-800 font-sans relative md:flex overflow-x-hidden">
+  
   <!-- ================= 1. 歡迎頁 (Splash Screen) ================= -->
   <div id="splash-screen" class="fixed inset-0 z-[100] bg-milktea flex flex-col items-center justify-center transition-opacity duration-500">
     <h1 class="text-4xl md:text-5xl font-extrabold text-morandi-dark mb-2 tracking-wider drop-shadow-sm">香山國小校刊</h1>
     <p class="text-morandi-dark/80 mb-12 text-lg font-medium tracking-widest bg-morandi-light/50 px-5 py-1.5 rounded-full">探索校園美好點滴</p>
+    
     <div id="splash-loading" class="flex flex-col items-center">
       <svg class="animate-spin h-8 w-8 text-morandi-dark mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -52,99 +49,96 @@
     </button>
   </div>
   
-  <!-- ================= 2. 導覽列 (加入 order-2 md:order-1) ================= -->
-  <nav class="order-2 md:order-1 z-40 bg-white/60 backdrop-blur-2xl border-white/40 border-t md:border-t-0 md:border-r 
-              pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 md:pb-0 
-              w-full md:w-56 flex-shrink-0 flex md:flex-col md:h-full md:pt-10 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] md:shadow-xl transition-all">
+  <!-- ================= 2. 導覽列 ================= -->
+  <nav class="fixed z-40 bg-white/80 backdrop-blur-lg border-gray-200
+              bottom-0 w-full border-t pb-[calc(env(safe-area-inset-bottom)+0.5rem)] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]
+              md:top-0 md:left-0 md:w-56 md:h-screen md:border-t-0 md:border-r md:flex md:flex-col md:pt-10 md:shadow-xl transition-all">
     <div class="hidden md:block px-6 mb-8">
       <h1 class="text-2xl font-extrabold text-morandi-dark tracking-wider">香山國小</h1>
-      <h2 class="text-lg font-bold text-morandi-dark/80 tracking-widest">116週年校刊</h2>
+      <h2 class="text-lg font-bold text-morandi-dark/80 tracking-widest">116周年校刊</h2>
     </div>
-    <div class="flex md:flex-col justify-around md:justify-start items-center md:items-stretch w-full max-w-md md:max-w-none mx-auto px-2 md:px-4 md:space-y-2">
-      <button id="nav-admin" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start w-full transition-colors duration-300 text-morandi-dark md:bg-morandi-light/60 md:p-3 md:rounded-xl group">
-        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 10l7.1-6.3a1.3 1.3 0 0 1 1.8 0L20 10"></path><path d="M6 10v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-9"></path><path d="M10 21v-5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v5"></path></svg>
+    <div class="flex md:flex-col justify-around md:justify-start items-end md:items-stretch h-16 md:h-auto w-full max-w-md md:max-w-none mx-auto px-2 md:px-4 md:space-y-2 pb-2 md:pb-0">
+      <button id="nav-admin" class="nav-btn flex flex-col md:flex-row items-center md:justify-start w-full transition-all duration-200 text-morandi-dark scale-110 md:scale-100 md:bg-morandi-light/60 md:p-3 md:rounded-xl group">
+        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 10l7.1-6.3a1.3 1.3 0 0 1 1.8 0L20 10"></path><path d="M6 10v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-9"></path><path d="M10 21v-5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v5"></path></svg>
         <span class="text-[10px] md:text-base font-bold tracking-wider">行政</span>
       </button>
-      <button id="nav-lower" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start w-full transition-colors duration-300 text-gray-400 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
-        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22v-8"></path><path d="M12 14c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path><path d="M12 14c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path></svg>
+      <button id="nav-lower" class="nav-btn flex flex-col md:flex-row items-center md:justify-start w-full transition-all duration-200 text-gray-400 scale-90 md:scale-100 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
+        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22v-8"></path><path d="M12 14c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path><path d="M12 14c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path></svg>
         <span class="text-[10px] md:text-base font-bold tracking-wider">低年級</span>
       </button>
-      <button id="nav-middle" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start w-full transition-colors duration-300 text-gray-400 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
-        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22V6"></path><path d="M12 16c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path><path d="M12 11c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path><path d="M12 6c2.5 0 4-2 0-6-4 4-2.5 6 0 6z"></path></svg>
+      <button id="nav-middle" class="nav-btn flex flex-col md:flex-row items-center md:justify-start w-full transition-all duration-200 text-gray-400 scale-90 md:scale-100 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
+        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22V6"></path><path d="M12 16c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path><path d="M12 11c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path><path d="M12 6c2.5 0 4-2 0-6-4 4-2.5 6 0 6z"></path></svg>
         <span class="text-[10px] md:text-base font-bold tracking-wider">中年級</span>
       </button>
-      <button id="nav-upper" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start w-full transition-colors duration-300 text-gray-400 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
-        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22v-6"></path><path d="M18 16a5 5 0 0 0-1.5-9.5 6 6 0 0 0-10 1 4.5 4.5 0 0 0 1.5 8.5 Z"></path></svg>
+      <button id="nav-upper" class="nav-btn flex flex-col md:flex-row items-center md:justify-start w-full transition-all duration-200 text-gray-400 scale-90 md:scale-100 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
+        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22v-6"></path><path d="M18 16a5 5 0 0 0-1.5-9.5 6 6 0 0 0-10 1 4.5 4.5 0 0 0 1.5 8.5 Z"></path></svg>
         <span class="text-[10px] md:text-base font-bold tracking-wider">高年級</span>
       </button>
-      <button id="nav-kinder" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start w-full transition-colors duration-300 text-gray-400 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
-        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3s-6 5-6 10c0 4 3 7 6 7s6-3 6-7c0-5-6-10-6-10z"></path><path d="M9 12a4 4 0 0 0 0 5"></path></svg>
+      <button id="nav-kinder" class="nav-btn flex flex-col md:flex-row items-center md:justify-start w-full transition-all duration-200 text-gray-400 scale-90 md:scale-100 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
+        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3s-6 5-6 10c0 4 3 7 6 7s6-3 6-7c0-5-6-10-6-10z"></path><path d="M9 12a4 4 0 0 0 0 5"></path></svg>
         <span class="text-[10px] md:text-base font-bold tracking-wider">星光班及幼兒園</span>
       </button>
     </div>
   </nav>
-
-  <!-- ================= 3. 右側主內容區塊 (加入 order-1 md:order-2) ================= -->
-  <div class="order-1 md:order-2 flex-1 overflow-y-auto hide-scroll-x relative w-full h-full">
-    <header class="sticky top-0 z-30 bg-white/70 backdrop-blur-xl border-b border-gray-200">
+  
+  <!-- ================= 3. 右側主內容區塊 ================= -->
+  <div class="flex-1 flex flex-col min-h-screen md:ml-56">
+    <header class="sticky top-0 z-30 bg-white/70 backdrop-blur-md border-b border-gray-200">
       <div class="w-full max-w-7xl mx-auto px-4 md:px-8">
         <div class="flex space-x-2 py-3 hide-scroll-x" id="category-tabs"></div>
       </div>
     </header>
-    <div id="subcat-grid" class="p-4 md:p-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 max-w-7xl mx-auto w-full pb-8" style="display:none;"></div>
-    <main id="article-list" class="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-7xl mx-auto w-full pb-8" style="display:none;"></main>
+    
+    <div id="subcat-grid" class="p-4 md:p-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 max-w-7xl mx-auto w-full pb-24 md:pb-8" style="display:none;"></div>
+    <main id="article-list" class="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-7xl mx-auto w-full pb-24 md:pb-8" style="display:none;"></main>
   </div>
-
-  <!-- ================= 4. 閱讀文章彈窗 (物理強制留白與防割裂版) ================= -->
-  <div id="article-modal" class="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex flex-col justify-end md:justify-center items-center pt-[2vh] md:pt-8 transition-transform duration-300 translate-y-full md:translate-y-0 md:translate-x-full md:opacity-0" style="display:none;">
-    <!-- 外層容器：利用父層的 pt-[2vh] 把頂部 12% 空間強制隔離，自身填滿剩餘空間，overflow-hidden 確保滑動不破圖 -->
-    <div id="modal-inner" class="w-full md:w-[85vw] lg:max-w-6xl h-full md:h-[85vh] bg-milktea rounded-t-[2rem] md:rounded-[2rem] shadow-2xl flex flex-col relative overflow-hidden">
-     
-      <!-- 獨立的頂部控制列 (背景純色，阻絕底下滾動被看見) -->
-      <div class="w-full bg-milktea flex items-center justify-between px-4 py-3 md:py-4 border-b border-gray-200 shrink-0 z-20 shadow-sm relative">
-        <div class="w-10"></div> <!-- 左側佔位 -->
-        <!-- 絕對置中的手勢把手 -->
-        <div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-12 h-1.5 bg-gray-300 rounded-full md:hidden"></div>
-        <!-- 圓形關閉按鈕 -->
-        <button id="btn-close-modal" class="pointer-events-auto w-9 h-9 flex items-center justify-center bg-white text-gray-600 rounded-full shadow-sm border border-gray-100 hover:bg-gray-50 active:scale-90 transition relative z-10">
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+  
+  <!-- ================= 4. 閱讀文章彈窗 ================= -->
+  <div id="article-modal" class="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 transition-transform duration-300 translate-x-full md:translate-x-0 md:opacity-0" style="display:none;">
+    <div id="modal-inner" class="w-full md:w-[85vw] lg:max-w-6xl bg-white rounded-[2rem] shadow-2xl overflow-y-auto max-h-[90vh] md:max-h-[85vh] relative flex flex-col hide-scroll-x">
+      <header class="sticky top-0 w-full z-10 bg-gradient-to-b from-black/20 to-transparent p-4 flex items-center justify-between pointer-events-none">
+        <div class="flex-1"></div>
+        <button id="btn-close-modal" class="pointer-events-auto text-white bg-black/30 backdrop-blur-md hover:bg-black/50 p-2.5 rounded-full shadow-sm transition active:scale-90">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
         </button>
+      </header>
+      
+      <!-- 封面圖已隱藏 -->
+      <div id="modal-image-container" class="w-full h-64 md:h-[400px] bg-gray-200 -mt-16" style="display:none;">
+        <img id="modal-cover" src="" class="w-full h-full object-cover">
       </div>
-
-      <!-- 獨立的滾動內容區 -->
-      <div id="modal-scroll-content" class="flex-1 overflow-y-auto hide-scroll-x w-full relative bg-milktea/10">
-        <div id="modal-image-container" class="w-full h-64 md:h-[400px] shrink-0" style="display:none;">
-          <img id="modal-cover" src="" class="w-full h-full object-cover">
-        </div>
-        <div class="p-6 md:p-12 lg:p-16">
-          <div class="max-w-4xl mx-auto">
-            <div class="mb-6 border-b border-gray-200 pb-4" id="modal-header-padding">
-              <span class="text-xs md:text-sm font-semibold text-morandi-dark bg-morandi-light px-3 py-1.5 rounded-full mb-3 inline-block mt-4" id="modal-category"></span>
-              <h2 class="text-2xl md:text-4xl font-bold text-gray-900 mt-1 mb-4 leading-snug" id="modal-title"></h2>
-              <div class="flex justify-between text-sm md:text-base text-gray-500">
-                <span id="modal-author"></span><span id="modal-date"></span>
-              </div>
+      
+      <div class="p-6 md:p-12 lg:p-16 flex-1 bg-milktea/10 mt-6 md:mt-12" id="modal-header-padding">
+        <div class="max-w-4xl mx-auto">
+          <div class="mb-6 border-b border-gray-200 pb-4">
+            <span class="text-xs md:text-sm font-semibold text-morandi-dark bg-morandi-light px-3 py-1.5 rounded-full mb-3 inline-block" id="modal-category"></span>
+            <h2 class="text-2xl md:text-4xl font-bold text-gray-900 mt-1 mb-4 leading-snug" id="modal-title"></h2>
+            <div class="flex justify-between text-sm md:text-base text-gray-500">
+              <span id="modal-author"></span><span id="modal-date"></span>
             </div>
-            <div class="article-content text-gray-700 text-base md:text-lg leading-relaxed md:leading-loose mb-10" id="modal-content"></div>
           </div>
-          <div id="modal-gallery" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-8"></div>
+          <div class="article-content text-gray-700 text-base md:text-lg leading-relaxed md:leading-loose mb-10" id="modal-content"></div>
         </div>
+        
+        <div id="modal-gallery" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-8"></div>
       </div>
     </div>
   </div>
-
+  
   <!-- ================= 5. Lightbox 圖片放大 ================= -->
   <div id="lightbox" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center opacity-0 transition-opacity duration-300 touch-none" style="display:none;">
     <button id="btn-close-lightbox" class="absolute top-6 right-6 text-white p-3 z-20 bg-black/30 rounded-full hover:bg-white/20 transition active:scale-90">
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
     </button>
     <div id="lightbox-counter" class="absolute top-8 left-6 text-white/70 font-bold z-20 text-sm tracking-widest drop-shadow-md"></div>
+    
     <button id="btn-prev-img" class="absolute left-4 text-white p-4 z-20 opacity-50 hover:opacity-100 hidden md:block bg-black/30 rounded-full transition">
       <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
     </button>
     <button id="btn-next-img" class="absolute right-4 text-white p-4 z-20 opacity-50 hover:opacity-100 hidden md:block bg-black/30 rounded-full transition">
       <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
     </button>
+    
     <div class="w-full h-full flex items-center justify-center overflow-hidden pb-32 px-4 pt-16">
       <img id="lightbox-img" src="" draggable="false" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl select-none pointer-events-auto" style="transform: scale(0.95); transition: transform 0.3s ease;">
     </div>
@@ -154,6 +148,7 @@
     <div id="lightbox-thumbnails" class="absolute bottom-6 w-full flex justify-center space-x-2 px-4 overflow-x-auto hide-scroll-x z-20"></div>
   </div>
 
+  <!-- ================= 核心邏輯 ================= -->
   <script>
     var globalArticles = [];
     var currentMainCategory = '行政';
@@ -161,9 +156,13 @@
     var currentGalleryData = [];
     var currentLightboxIndex = 0;
     var imgScale = 1;
-    var imgTranslateX = 0, imgTranslateY = 0;
-    var lastTouchTime = 0, touchStartDistance = 0, isPinching = false;
-    var lastTouchX = 0, lastTouchY = 0;
+    var imgTranslateX = 0;
+    var imgTranslateY = 0;
+    var lastTouchTime = 0;
+    var touchStartDistance = 0;
+    var isPinching = false;
+    var lastTouchX = 0;
+    var lastTouchY = 0;
 
     function resetImageTransform() {
       imgScale = 1;
@@ -196,22 +195,27 @@
       }
       var filterBtn = e.target.closest('.filter-btn');
       if (filterBtn) { setSubCategory(filterBtn.innerText); return; }
+     
       var subCatCard = e.target.closest('.sub-cat-card');
       if (subCatCard) {
         var catName = subCatCard.querySelector('.cat-name').innerText;
         setSubCategory(catName);
         return;
       }
+     
       var card = e.target.closest('.article-card');
       if (card) { openModal(card.id.replace('article-', '')); return; }
+     
       var thumb = e.target.closest('.gallery-thumb');
       if (thumb) { openLightbox(parseInt(thumb.id.replace('thumb-', ''), 10)); return; }
+     
       var lbThumb = e.target.closest('[id^="lb-thumb-"]');
       if (lbThumb) {
         currentLightboxIndex = parseInt(lbThumb.id.replace('lb-thumb-', ''), 10);
         updateLightboxImage();
         return;
       }
+     
       if (e.target.id === 'article-modal') { closeModal(); return; }
       if (e.target.id === 'lightbox') { closeLightbox(); return; }
       if (e.target.closest('#btn-close-modal')) closeModal();
@@ -224,17 +228,15 @@
     document.addEventListener('touchstart', function(e) {
       touchStartX = e.changedTouches[0].clientX;
       touchStartY = e.changedTouches[0].clientY;
-      var scrollContent = document.getElementById('modal-scroll-content');
-      if (scrollContent) touchStartScrollTop = scrollContent.scrollTop;
+      var modalInner = document.getElementById('modal-inner');
+      if (modalInner) touchStartScrollTop = modalInner.scrollTop;
     }, {passive: true});
 
-document.addEventListener('touchend', function(e) {
+    document.addEventListener('touchend', function(e) {
       var touchEndX = e.changedTouches[0].clientX;
       var touchEndY = e.changedTouches[0].clientY;
       var diffX = touchEndX - touchStartX;
       var diffY = touchEndY - touchStartY;
-      
-      // 1. Lightbox 圖片放大狀態
       var lb = document.getElementById('lightbox');
       if (lb && lb.style.display !== 'none') {
         if (imgScale > 1) return;
@@ -245,44 +247,20 @@ document.addEventListener('touchend', function(e) {
         }
         return;
       }
-      
-      // 2. 閱讀文章彈窗狀態
+     
       var modal = document.getElementById('article-modal');
       if (modal && modal.style.display !== 'none') {
+        if (Math.abs(diffY) < 60 && Math.abs(diffX) > 80) { closeModal(); return; }
         if (diffY > 80 && Math.abs(diffY) > Math.abs(diffX) && touchStartScrollTop <= 0) { closeModal(); return; }
-        return; // 在彈窗內不觸發底層頁面的左右滑動
-      }
-
-      // 3. 主頁面：左右滑動切換次分類
-      // 判斷條件：已選擇次分類、水平滑動 > 60px，且水平距離大於垂直距離 2 倍 (避免上下滑動時誤觸)
-      if (currentSubCategory !== '' && Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY) * 2) {
-        var subs = [];
-        globalArticles.forEach(function(a) {
-          if (a.main_category === currentMainCategory && a.sub_category && !subs.includes(a.sub_category)) subs.push(a.sub_category);
-        });
-        subs = sortSubCategories(subs);
-        var currentIndex = subs.indexOf(currentSubCategory);
-        
-        if (currentIndex !== -1) {
-          if (diffX < 0 && currentIndex < subs.length - 1) {
-            // 手指往左滑 (diffX < 0)，切換到「下一個」分類
-            setSubCategory(subs[currentIndex + 1]);
-          } else if (diffX > 0 && currentIndex > 0) {
-            // 手指往右滑 (diffX > 0)，切換到「上一個」分類
-            setSubCategory(subs[currentIndex - 1]);
-          }
-        }
       }
     }, {passive: true});
 
-// 增加 size 參數，預設為 s800 (寬/高最大 800px)
-    function formatDriveUrl(url, size) {
+    function formatDriveUrl(url) {
       if (!url || typeof url !== 'string') return '';
       if (!url.includes('drive.google.com')) return url;
-      var sizeParam = size ? '=' + size : '=s800'; // 預設做 800px 縮圖
-      var match = url.match(/\/d\/(.+?)\//) || url.match(/id=(.+?)(&|$)/);
+      var match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
       if (match && match[1]) {
-        return 'https://lh3.googleusercontent.com/d/' + match[1] + sizeParam;
+        return 'https://lh3.googleusercontent.com/d/' + match[1];
       }
       return url;
     }
@@ -294,7 +272,8 @@ document.addEventListener('touchend', function(e) {
         '藍鯨班': 21, '海馬班': 22, '珊瑚班': 23, '海豚班': 24, '星光班': 25,
       };
       return subs.sort(function(a, b) {
-        var weightA = 999, weightB = 999;
+        var weightA = 999;
+        var weightB = 999;
         for (var key in orderMap) { if (a.indexOf(key) !== -1) weightA = orderMap[key]; }
         for (var key in orderMap) { if (b.indexOf(key) !== -1) weightB = orderMap[key]; }
         if (weightA !== weightB) return weightA - weightB;
@@ -302,27 +281,21 @@ document.addEventListener('touchend', function(e) {
       });
     }
 
-window.onload = function() {
-      // ⚠️ 請記得把下方的網址換成你 GAS 最新部署出來的網址
+    window.onload = function() {
+      // ⚠️ 請把下方的網址換成你的 GAS「完全公開版」網址
       var API_URL = 'https://script.google.com/macros/s/AKfycbx0WYcfguRrU0oj-BMRjnwrz6LySteDiy7ZMuF4WnaoKFJoqtL3nF3Bpe0M7bm2PG9Z/exec?api=true'; 
       
       var loadingEl = document.getElementById('splash-loading');
       if (loadingEl) loadingEl.style.display = 'flex';
 
-      // 向 Apps Script 請求資料
       fetch(API_URL)
-        .then(function(response) { 
-          return response.json(); 
-        })
-        .then(function(data) { 
-          initApp(data); 
-        })
-        .catch(function(error) { 
-          showError(error); 
+        .then(function(response) { return response.json(); })
+        .then(function(data) { initApp(data); })
+        .catch(function(error) {
+          showError(error);
           console.error("資料讀取失敗:", error);
         });
 
-      // ================= 以下為你原本保留的 Lightbox 觸控與縮放功能 =================
       var lbImg = document.getElementById('lightbox-img');
       if (lbImg) {
         lbImg.addEventListener('dblclick', function(e) {
@@ -405,13 +378,14 @@ window.onload = function() {
     function setMainCategory(mainCat, activeNavId) {
       currentMainCategory = mainCat;
       currentSubCategory = '';
+     
       document.querySelectorAll('.nav-btn').forEach(function(btn) {
         if (btn.id === activeNavId) {
-          btn.classList.add('text-morandi-dark', 'md:bg-morandi-light/60');
-          btn.classList.remove('text-gray-400', 'md:hover:bg-gray-100');
+          btn.classList.add('text-morandi-dark', 'scale-110', 'md:bg-morandi-light/60');
+          btn.classList.remove('text-gray-400', 'scale-90', 'md:scale-100', 'md:hover:bg-gray-100');
         } else {
-          btn.classList.remove('text-morandi-dark', 'md:bg-morandi-light/60');
-          btn.classList.add('text-gray-400', 'md:hover:bg-gray-100');
+          btn.classList.remove('text-morandi-dark', 'scale-110', 'md:bg-morandi-light/60');
+          btn.classList.add('text-gray-400', 'scale-90', 'md:scale-100', 'md:hover:bg-gray-100');
         }
       });
       var subs = [];
@@ -434,38 +408,30 @@ window.onload = function() {
       filterArticles();
     }
 
-function renderTabs(categories) {
+    function renderTabs(categories) {
       var container = document.getElementById('category-tabs');
       container.innerHTML = '';
       if (categories.length === 0) { container.style.display = 'none'; return; }
       container.style.display = 'flex';
-      
       categories.forEach(function(cat) {
         var btn = document.createElement('button');
-        var isActive = (cat === currentSubCategory);
-        var style = isActive
-          ? 'bg-morandi-dark text-white shadow-md active-tab' // 加入 active-tab class 作為定位標記
+        var style = (cat === currentSubCategory)
+          ? 'bg-morandi-dark text-white shadow-md'
           : 'bg-white text-gray-500 border border-gray-200 hover:bg-morandi-light hover:text-morandi-dark';
         btn.className = 'filter-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium tracking-wide transition-colors ' + style;
         btn.innerText = cat;
         container.appendChild(btn);
       });
-
-      // 自動將選中的次分類標籤平滑滾動到畫面中央
-      setTimeout(function() {
-        var activeTab = container.querySelector('.active-tab');
-        if (activeTab) {
-          activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }
-      }, 50);
     }
 
     function renderSubCategoryGrid(subs) {
       var gridContainer = document.getElementById('subcat-grid');
       var listContainer = document.getElementById('article-list');
+     
       listContainer.style.display = 'none';
       gridContainer.style.display = 'grid';
       gridContainer.innerHTML = '';
+     
       if (subs.length === 0) {
         gridContainer.style.display = 'block';
         gridContainer.innerHTML = '<div class="text-center p-8 bg-cardBg rounded-2xl border border-white mt-12 shadow-sm"><p class="text-gray-500 font-bold text-lg">這個分類目前沒有內容喔！</p></div>';
@@ -473,13 +439,12 @@ function renderTabs(categories) {
       }
       subs.forEach(function(sub, index) {
         var card = document.createElement('div');
+       
         var colors = ['bg-morandi-taupe', 'bg-morandi-pink', 'bg-morandi-pink', 'bg-morandi-taupe'];
         var bgClass = colors[index % 4] + ' hover:opacity-90';
-        card.className = 'sub-cat-card backdrop-blur-md rounded-[20px] py-6 px-2 md:py-8 md:px-4 shadow-sm cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center text-center ' + bgClass;
-        var h3 = document.createElement('h3');
-        h3.className = 'cat-name text-lg md:text-2xl lg:text-3xl font-bold text-white tracking-wider md:tracking-[0.2em] drop-shadow-sm';
-        h3.textContent = sub;
-        card.appendChild(h3);
+       
+        card.className = 'sub-cat-card backdrop-blur-md rounded-2xl py-6 px-2 md:py-8 md:px-4 shadow-sm border border-white/30 cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center text-center ' + bgClass;
+        card.innerHTML = '<h3 class="cat-name text-lg md:text-2xl lg:text-3xl font-bold text-white tracking-wider md:tracking-[0.2em] drop-shadow-sm">' + sub + '</h3>';
         gridContainer.appendChild(card);
       });
     }
@@ -492,7 +457,7 @@ function renderTabs(categories) {
       renderArticles(filtered);
     }
 
-function renderArticles(articles) {
+    function renderArticles(articles) {
       var gridContainer = document.getElementById('subcat-grid');
       var listContainer = document.getElementById('article-list');
      
@@ -531,7 +496,7 @@ function renderArticles(articles) {
         topRow.innerHTML = '<span class="text-xs font-medium text-morandi-dark bg-morandi-light px-3 py-1.5 rounded-full">' + (article.sub_category || article.main_category || '未分類') + '</span>';
         leftCol.appendChild(topRow);
         
-        // 【修改點 1】如果有標題才顯示，沒有標題就不建立這個元素
+        // 只有在有標題時才顯示 <h2>，隱藏「無標題」
         if (article.title) {
           var title = document.createElement('h2');
           title.className = 'text-lg md:text-xl font-bold text-gray-800 line-clamp-2 leading-snug';
@@ -564,14 +529,13 @@ function renderArticles(articles) {
             imgTag.className = 'w-full h-full object-cover';
             imgDiv.appendChild(imgTag);
             
-            // 【修改點 2】移除了原本覆蓋在第一張圖上方的半透明黑底霧化與 +X 文字
+            // 移除了黑底霧化與 +X 文字
             rightCol.appendChild(imgDiv);
           }
           contentRow.appendChild(rightCol);
         }
         card.appendChild(contentRow);
         
-        // 如果有作者才顯示底部區塊
         if (article.author) {
           var author = document.createElement('p');
           author.className = 'text-lg md:text-xl font-bold text-morandi-dark text-right mt-4 border-t border-gray-200/60 pt-4 shrink-0';
@@ -582,29 +546,21 @@ function renderArticles(articles) {
         listContainer.appendChild(card);
       });
     }
-        card.appendChild(contentRow);
-        var author = document.createElement('p');
-        author.className = 'text-lg md:text-xl font-bold text-morandi-dark text-right mt-4 border-t border-gray-200/60 pt-4 shrink-0';
-        author.innerText = article.author || '';
-        card.appendChild(author);
-        listContainer.appendChild(card);
-      });
-    }
 
-function openModal(articleId) {
+    function openModal(articleId) {
       var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); });
       if(!article) return;
       
-      // 【修改點 3】直接隱藏上方巨大的封面區塊
+      // 隱藏上方大封面
       var imgContainer = document.getElementById('modal-image-container');
       imgContainer.style.display = 'none';
       
       var headerPadding = document.getElementById('modal-header-padding');
-      headerPadding.classList.add('mt-12'); // 確保上方留白好看
+      headerPadding.classList.add('mt-12');
      
       document.getElementById('modal-category').innerText = article.sub_category || article.main_category || '未分類';
       
-      // 【修改點 4】處理無標題狀態
+      // 如果沒有標題，則隱藏大字標題區塊
       var modalTitle = document.getElementById('modal-title');
       if (article.title) {
           modalTitle.innerText = article.title;
@@ -621,87 +577,7 @@ function openModal(articleId) {
       galleryContainer.innerHTML = '';
       currentGalleryData = [];
      
-      // 【修改點 5】將封面圖直接當作畫廊(下方小縮圖)的第一張照片
-      var safeCoverUrl = formatDriveUrl(article.cover_image);
-      var thumbIndex = 0;
-      
-      if (safeCoverUrl) {
-        currentGalleryData.push({ url: safeCoverUrl, caption: '' });
-        var cDiv = document.createElement('div');
-        cDiv.className = 'gallery-thumb w-full aspect-square bg-gray-200 overflow-hidden cursor-pointer rounded-lg hover:ring-2 hover:ring-morandi-taupe transition-all';
-        cDiv.id = 'thumb-' + thumbIndex;
-        var cImg = document.createElement('img');
-        cImg.src = safeCoverUrl;
-        cImg.className = 'w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity';
-        cDiv.appendChild(cImg);
-        galleryContainer.appendChild(cDiv);
-        thumbIndex++;
-      }
-      
-      if (article.gallery) {
-        var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
-        items.forEach(function(item) {
-          var parts = item.split('|||');
-          var rawUrl = parts[0];
-          var captionText = parts.length > 1 ? parts[1] : '';
-          var safeUrl = formatDriveUrl(rawUrl);
-         
-          if (safeUrl) {
-            currentGalleryData.push({ url: safeUrl, caption: captionText });
-            var gDiv = document.createElement('div');
-            gDiv.className = 'gallery-thumb w-full aspect-square bg-gray-200 overflow-hidden cursor-pointer rounded-lg hover:ring-2 hover:ring-morandi-taupe transition-all';
-            gDiv.id = 'thumb-' + thumbIndex;
-            var gImg = document.createElement('img');
-            gImg.src = safeUrl;
-            gImg.className = 'w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity';
-            gDiv.appendChild(gImg);
-            galleryContainer.appendChild(gDiv);
-            thumbIndex++;
-          }
-        });
-      }
-      
-      var modal = document.getElementById('article-modal');
-      modal.style.display = 'flex';
-      document.body.classList.add('modal-open');
-      setTimeout(function() {
-        modal.classList.remove('translate-x-full');
-        modal.classList.remove('md:opacity-0');
-      }, 10);
-     
-      var modalInner = document.getElementById('modal-inner');
-      if (modalInner) modalInner.scrollTop = 0;
-    }function openModal(articleId) {
-      var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); });
-      if(!article) return;
-      
-      // 【修改點 3】直接隱藏上方巨大的封面區塊
-      var imgContainer = document.getElementById('modal-image-container');
-      imgContainer.style.display = 'none';
-      
-      var headerPadding = document.getElementById('modal-header-padding');
-      headerPadding.classList.add('mt-12'); // 確保上方留白好看
-     
-      document.getElementById('modal-category').innerText = article.sub_category || article.main_category || '未分類';
-      
-      // 【修改點 4】處理無標題狀態
-      var modalTitle = document.getElementById('modal-title');
-      if (article.title) {
-          modalTitle.innerText = article.title;
-          modalTitle.style.display = 'block';
-      } else {
-          modalTitle.style.display = 'none';
-      }
-
-      document.getElementById('modal-author').innerText = article.author || '';
-      document.getElementById('modal-date').innerText = article.publish_date || '';
-      document.getElementById('modal-content').innerText = article.content || '';
-      
-      var galleryContainer = document.getElementById('modal-gallery');
-      galleryContainer.innerHTML = '';
-      currentGalleryData = [];
-     
-      // 【修改點 5】將封面圖直接當作畫廊(下方小縮圖)的第一張照片
+      // 將封面與畫廊全部當成下方縮圖處理
       var safeCoverUrl = formatDriveUrl(article.cover_image);
       var thumbIndex = 0;
       
@@ -752,24 +628,10 @@ function openModal(articleId) {
       var modalInner = document.getElementById('modal-inner');
       if (modalInner) modalInner.scrollTop = 0;
     }
-  
-  var modal = document.getElementById('article-modal');
-  modal.style.display = 'flex';
-  document.body.classList.add('modal-open');
-  setTimeout(function() {
-    modal.classList.remove('translate-y-full');
-    modal.classList.remove('md:translate-x-full');
-    modal.classList.remove('md:opacity-0');
-  }, 10);
-  
-  var scrollContent = document.getElementById('modal-scroll-content');
-  if (scrollContent) scrollContent.scrollTop = 0;
-}
 
     function closeModal() {
       var modal = document.getElementById('article-modal');
-      modal.classList.add('translate-y-full');
-      modal.classList.add('md:translate-x-full');
+      modal.classList.add('translate-x-full');
       modal.classList.add('md:opacity-0');
       setTimeout(function() {
         modal.style.display = 'none';
@@ -778,34 +640,34 @@ function openModal(articleId) {
     }
    
     function openLightbox(index) {
-  if(currentGalleryData.length === 0) return;
-  currentLightboxIndex = index;
-  var tbContainer = document.getElementById('lightbox-thumbnails');
-  tbContainer.innerHTML = '';
-  
-  // 修正：這裡的參數是 item，使用 item.url 產生底部縮圖
-  currentGalleryData.forEach(function(item, i) {
-    var img = document.createElement('img');
-    img.src = item.url;
-    img.id = 'lb-thumb-' + i;
-    img.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
-    tbContainer.appendChild(img);
-  });
-  
-  updateLightboxImage();
-  var lb = document.getElementById('lightbox');
-  var lbImg = document.getElementById('lightbox-img');
-  lb.style.display = 'flex';
-  setTimeout(function() {
-    lb.classList.remove('opacity-0');
-    lbImg.style.transition = 'transform 0.3s ease';
-    lbImg.style.transform = 'scale(1)';
-  }, 10);
-}
-    
+      if(currentGalleryData.length === 0) return;
+      currentLightboxIndex = index;
+     
+      var tbContainer = document.getElementById('lightbox-thumbnails');
+      tbContainer.innerHTML = '';
+      currentGalleryData.forEach(function(data, i) {
+        var img = document.createElement('img');
+        img.src = data.url;
+        img.id = 'lb-thumb-' + i;
+        img.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
+        tbContainer.appendChild(img);
+      });
+      updateLightboxImage();
+     
+      var lb = document.getElementById('lightbox');
+      var lbImg = document.getElementById('lightbox-img');
+      lb.style.display = 'flex';
+      setTimeout(function() {
+        lb.classList.remove('opacity-0');
+        lbImg.style.transition = 'transform 0.3s ease';
+        lbImg.style.transform = 'scale(1)';
+      }, 10);
+    }
+
     function closeLightbox() {
       var lb = document.getElementById('lightbox');
       var lbImg = document.getElementById('lightbox-img');
+     
       resetImageTransform();
       lb.classList.add('opacity-0');
       lbImg.style.transition = 'transform 0.3s ease';
@@ -813,46 +675,38 @@ function openModal(articleId) {
       setTimeout(function() { lb.style.display = 'none'; }, 300);
     }
    
-function updateLightboxImage() {
-  resetImageTransform();
-  var img = document.getElementById('lightbox-img');
-  var captionEl = document.getElementById('lightbox-caption-text');
-  
-  // currentData 在這裡定義
-  var currentData = currentGalleryData[currentLightboxIndex];
-  
-  img.style.transition = 'transform 0.1s ease';
-  img.style.transform = 'scale(0.95)';
-  
-  // 只有在彈出全螢幕大圖時，才請求高解析度 (2000px) 的照片
-  img.src = formatDriveUrl(currentData.rawUrl || currentData.url, 's2000');
-  
-  if (currentData.caption) {
-    captionEl.innerText = currentData.caption;
-    captionEl.style.display = 'inline-block';
-  } else {
-    captionEl.style.display = 'none';
-  }
-  
-  setTimeout(function() {
-    img.style.transition = 'transform 0.3s ease';
-    img.style.transform = 'scale(1)';
-  }, 50);
-  
-  document.getElementById('lightbox-counter').innerText = (currentLightboxIndex + 1) + ' / ' + currentGalleryData.length;
-  
-  currentGalleryData.forEach(function(_, i) {
-    var thumb = document.getElementById('lb-thumb-' + i);
-    if(thumb) {
-      if (i === currentLightboxIndex) {
-        thumb.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-100 ring-2 ring-white scale-110';
-        thumb.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
+    function updateLightboxImage() {
+      resetImageTransform();
+      var img = document.getElementById('lightbox-img');
+      var captionEl = document.getElementById('lightbox-caption-text');
+      var currentData = currentGalleryData[currentLightboxIndex];
+      img.style.transition = 'transform 0.1s ease';
+      img.style.transform = 'scale(0.95)';
+      img.src = currentData.url;
+     
+      if (currentData.caption) {
+        captionEl.innerText = currentData.caption;
+        captionEl.style.display = 'inline-block';
       } else {
-        thumb.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
+        captionEl.style.display = 'none';
       }
+      setTimeout(function() {
+        img.style.transition = 'transform 0.3s ease';
+        img.style.transform = 'scale(1)';
+      }, 50);
+      document.getElementById('lightbox-counter').innerText = (currentLightboxIndex + 1) + ' / ' + currentGalleryData.length;
+      currentGalleryData.forEach(function(_, i) {
+        var thumb = document.getElementById('lb-thumb-' + i);
+        if(thumb) {
+          if (i === currentLightboxIndex) {
+            thumb.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-100 ring-2 ring-white scale-110';
+            thumb.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
+          } else {
+            thumb.className = 'w-12 h-12 rounded-md object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
+          }
+        }
+      });
     }
-  });
-}
    
     function prevImage() { if (currentLightboxIndex > 0) { currentLightboxIndex--; updateLightboxImage(); } }
     function nextImage() { if (currentLightboxIndex < currentGalleryData.length - 1) { currentLightboxIndex++; updateLightboxImage(); } }
