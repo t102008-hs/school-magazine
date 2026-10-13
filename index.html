@@ -302,9 +302,9 @@ document.addEventListener('touchend', function(e) {
       });
     }
 
-window.onload = function() {
+     window.onload = function() {
       // 1. 換成你剛剛複製並加上 ?api=true 的最新 GAS 網址
-      var API_URL = 'https://script.google.com/a/macros/tmail.hc.edu.tw/s/AKfycbyirrh5kS5_rp8bgyqts7ciy_PaLOBgiK84H7WaAVtnYs1OkCT3c_Kdn57diJFt_B-2/exec?api=true'; 
+      var API_URL = 'https://script.google.com/a/macros/tmail.hc.edu.tw/s/AKfycbyirrh5kS5_rp8bgyqts7ciy_PaLOBgiK84H7WaAVtnYs1OkCT3c_Kdn57diJFt_B-2/exec'; 
       
       // 2. 顯示載入動畫 (如果有這個元素的話)
       var loadingEl = document.getElementById('splash-loading');
@@ -322,9 +322,9 @@ window.onload = function() {
           showError(error);
           console.error("資料讀取失敗:", error);
         });
-     window.onload = function() {
+window.onload = function() {
       // ⚠️ 請記得把下方的網址換成你 GAS 最新部署出來的網址
-      var API_URL = 'https://script.google.com/a/macros/tmail.hc.edu.tw/s/AKfycbyirrh5kS5_rp8bgyqts7ciy_PaLOBgiK84H7WaAVtnYs1OkCT3c_Kdn57diJFt_B-2/exec?api=true'; 
+      var API_URL = 'https://script.google.com/macros/s/你的部署ID/exec?api=true'; 
       
       var loadingEl = document.getElementById('splash-loading');
       if (loadingEl) loadingEl.style.display = 'flex';
@@ -341,72 +341,77 @@ window.onload = function() {
           showError(error); 
           console.error("資料讀取失敗:", error);
         });
+
+      // ================= 以下為你原本保留的 Lightbox 觸控與縮放功能 =================
       var lbImg = document.getElementById('lightbox-img');
-      lbImg.addEventListener('dblclick', function(e) {
-        if (imgScale > 1) resetImageTransform();
-        else {
-          imgScale = 2.5;
-          lbImg.style.transition = 'transform 0.3s ease';
-          lbImg.style.transform = 'translate(0px, 0px) scale(' + imgScale + ')';
-        }
-      });
-      lbImg.addEventListener('touchstart', function(e) {
-        if (e.touches.length === 1) {
-          var currentTime = new Date().getTime();
-          var tapLength = currentTime - lastTouchTime;
-          if (tapLength < 300 && tapLength > 0) {
-            e.preventDefault();
-            if (imgScale > 1) resetImageTransform();
-            else {
-              imgScale = 2.5;
-              lbImg.style.transition = 'transform 0.3s ease';
-              lbImg.style.transform = 'translate(0px, 0px) scale(' + imgScale + ')';
-            }
+      if (lbImg) {
+        lbImg.addEventListener('dblclick', function(e) {
+          if (imgScale > 1) {
+            resetImageTransform();
           } else {
+            imgScale = 2.5;
+            lbImg.style.transition = 'transform 0.3s ease';
+            lbImg.style.transform = 'translate(0px, 0px) scale(' + imgScale + ')';
+          }
+        });
+        lbImg.addEventListener('touchstart', function(e) {
+          if (e.touches.length === 1) {
+            var currentTime = new Date().getTime();
+            var tapLength = currentTime - lastTouchTime;
+            if (tapLength < 300 && tapLength > 0) {
+              e.preventDefault();
+              if (imgScale > 1) {
+                resetImageTransform();
+              } else {
+                imgScale = 2.5;
+                lbImg.style.transition = 'transform 0.3s ease';
+                lbImg.style.transform = 'translate(0px, 0px) scale(' + imgScale + ')';
+              }
+            } else {
+              lbImg.style.transition = 'none';
+              lastTouchX = e.touches[0].clientX;
+              lastTouchY = e.touches[0].clientY;
+            }
+            lastTouchTime = currentTime;
+          } else if (e.touches.length === 2) {
+            e.preventDefault();
+            isPinching = true;
             lbImg.style.transition = 'none';
+            touchStartDistance = Math.hypot(
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY
+            );
+          }
+        }, {passive: false});
+        lbImg.addEventListener('touchmove', function(e) {
+          if (e.touches.length === 1 && imgScale > 1 && !isPinching) {
+            e.preventDefault();
+            e.stopPropagation();
+            var deltaX = e.touches[0].clientX - lastTouchX;
+            var deltaY = e.touches[0].clientY - lastTouchY;
+            imgTranslateX += deltaX;
+            imgTranslateY += deltaY;
             lastTouchX = e.touches[0].clientX;
             lastTouchY = e.touches[0].clientY;
+            lbImg.style.transform = 'translate(' + imgTranslateX + 'px, ' + imgTranslateY + 'px) scale(' + imgScale + ')';
+          } else if (e.touches.length === 2) {
+            e.preventDefault();
+            e.stopPropagation();
+            var currentDistance = Math.hypot(
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY
+            );
+            var scaleChange = currentDistance / touchStartDistance;
+            imgScale = Math.min(Math.max(1, imgScale * scaleChange), 5);
+            touchStartDistance = currentDistance;
+            lbImg.style.transform = 'translate(' + imgTranslateX + 'px, ' + imgTranslateY + 'px) scale(' + imgScale + ')';
           }
-          lastTouchTime = currentTime;
-        } else if (e.touches.length === 2) {
-          e.preventDefault();
-          isPinching = true;
-          lbImg.style.transition = 'none';
-          touchStartDistance = Math.hypot(
-            e.touches[0].clientX - e.touches[1].clientX,
-            e.touches[0].clientY - e.touches[1].clientY
-          );
-        }
-      }, {passive: false});
-      lbImg.addEventListener('touchmove', function(e) {
-        if (e.touches.length === 1 && imgScale > 1 && !isPinching) {
-          e.preventDefault();
-          e.stopPropagation();
-          var deltaX = e.touches[0].clientX - lastTouchX;
-          var deltaY = e.touches[0].clientY - lastTouchY;
-          imgTranslateX += deltaX;
-          imgTranslateY += deltaY;
-          lastTouchX = e.touches[0].clientX;
-          lastTouchY = e.touches[0].clientY;
-          lbImg.style.transform = 'translate(' + imgTranslateX + 'px, ' + imgTranslateY + 'px) scale(' + imgScale + ')';
-        } else if (e.touches.length === 2) {
-          e.preventDefault();
-          e.stopPropagation();
-          var currentDistance = Math.hypot(
-            e.touches[0].clientX - e.touches[1].clientX,
-            e.touches[0].clientY - e.touches[1].clientY
-          );
-          var scaleChange = currentDistance / touchStartDistance;
-          imgScale = Math.min(Math.max(1, imgScale * scaleChange), 5);
-          touchStartDistance = currentDistance;
-          lbImg.style.transform = 'translate(' + imgTranslateX + 'px, ' + imgTranslateY + 'px) scale(' + imgScale + ')';
-        }
-      }, {passive: false});
-      lbImg.addEventListener('touchend', function(e) {
-        if (e.touches.length < 2) isPinching = false;
-        if (imgScale < 1) resetImageTransform();
-      }, {passive: true});
-     }
+        }, {passive: false});
+        lbImg.addEventListener('touchend', function(e) {
+          if (e.touches.length < 2) isPinching = false;
+          if (imgScale < 1) resetImageTransform();
+        }, {passive: true});
+      }
     };
 
     function initApp(articles) {
