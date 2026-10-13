@@ -290,7 +290,7 @@
     }
 
     // ★ 重構：高資訊密度的精巧版卡片排版
-    function renderArticles(articles) {
+function renderArticles(articles) {
       var gridContainer = document.getElementById('subcat-grid'); var listContainer = document.getElementById('article-list');
       gridContainer.style.display = 'none'; listContainer.style.display = 'grid'; listContainer.innerHTML = '';
       if (!articles || articles.length === 0) { listContainer.style.display = 'block'; listContainer.innerHTML = '<div class="text-center p-8 bg-white/60 rounded-3xl border border-white mt-12 shadow-sm"><p class="text-gray-500 font-bold text-lg">這個分類目前沒有文章喔！</p></div>'; return; }
@@ -301,48 +301,35 @@
         card.id = 'article-' + article.id;
         
         var allImages = [];
-        if (article.cover_image) allImages.push(formatDriveUrl(article.cover_image));
+        // 徹底移除 cover_image 判斷，全數由 gallery 提取
         if (article.gallery) {
           var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
           items.forEach(function(item) { var url = formatDriveUrl(item.split('|||')[0]); if (url) allImages.push(url); });
         }
         allImages = allImages.filter(function(item, pos) { return allImages.indexOf(item) == pos; });
         
-        // 內容水平排版：左邊文字，右邊相疊圖片
         var contentHtml = '<div class="flex justify-between items-start gap-4 flex-1">';
-        
-        // 左側文字區塊
         contentHtml += '<div class="flex-1 flex flex-col">';
         contentHtml += '<div class="mb-2"><span class="text-[10px] md:text-xs font-bold text-morandi-dark bg-morandi-light/80 px-2.5 py-1 rounded-full">' + (article.sub_category || article.main_category || '未分類') + '</span></div>';
-        if (article.title) {
-            contentHtml += '<h2 class="text-base md:text-lg font-bold text-gray-800 line-clamp-3 leading-snug">' + article.title + '</h2>';
-        }
+        if (article.title) contentHtml += '<h2 class="text-base md:text-lg font-bold text-gray-800 line-clamp-3 leading-snug">' + article.title + '</h2>';
         contentHtml += '</div>';
         
-        // 右側乾淨相疊的縮圖
         if (allImages.length > 0) {
             contentHtml += '<div class="relative w-20 h-20 md:w-24 md:h-24 shrink-0">';
             var displayCount = Math.min(allImages.length, 3);
             for (var i = displayCount - 1; i >= 0; i--) {
                 contentHtml += '<div class="absolute rounded-xl shadow-sm border-[2px] border-white overflow-hidden bg-gray-100" style="width:calc(100% - 6px); height:calc(100% - 6px); top:' + (i * 3) + 'px; right:' + ((displayCount - 1 - i) * 3) + 'px; z-index:' + (30 - i * 10) + '">';
-                contentHtml += '<img src="' + allImages[i] + '" class="w-full h-full object-cover">';
-                contentHtml += '</div>';
+                contentHtml += '<img src="' + allImages[i] + '" class="w-full h-full object-cover"></div>';
             }
             contentHtml += '</div>';
         }
         contentHtml += '</div>';
+        if (article.author) contentHtml += '<div class="mt-3 pt-3 border-t border-gray-100/80 text-right shrink-0"><span class="text-xs md:text-sm font-bold text-gray-400">作者 / ' + article.author + '</span></div>';
         
-        // 底部作者
-        if (article.author) {
-            contentHtml += '<div class="mt-3 pt-3 border-t border-gray-100/80 text-right shrink-0"><span class="text-xs md:text-sm font-bold text-gray-400">作者 / ' + article.author + '</span></div>';
-        }
-        
-        card.innerHTML = contentHtml;
-        listContainer.appendChild(card);
+        card.innerHTML = contentHtml; listContainer.appendChild(card);
       });
     }
 
-    // ★ 重構彈窗：取消巨大首圖，所有圖片直接排在底部畫廊
     function openModal(articleId) {
       var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); if(!article) return;
       document.getElementById('modal-category').innerText = article.sub_category || article.main_category || '未分類';
@@ -353,7 +340,7 @@
       document.getElementById('modal-content').innerText = article.content || '';
       
       var allImages = [];
-      if (article.cover_image) allImages.push({ safeUrl: formatDriveUrl(article.cover_image), caption: '' });
+      // 徹底移除 cover_image 判斷
       if (article.gallery) {
         var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
         items.forEach(function(item) {
@@ -366,7 +353,6 @@
       var galleryContainer = document.getElementById('modal-gallery');
       galleryContainer.innerHTML = '';
       
-      // 所有圖片直接進入畫廊方格
       for (var i = 0; i < allImages.length; i++) {
           var gDiv = document.createElement('div');
           gDiv.className = 'gallery-thumb w-full aspect-square bg-gray-100 overflow-hidden cursor-pointer rounded-xl hover:ring-2 hover:ring-morandi-taupe transition-all';
