@@ -86,7 +86,7 @@
     <div class="md:bg-white/60 md:backdrop-blur-2xl md:rounded-[2.5rem] md:shadow-xl md:border md:border-white/50 flex-1 flex flex-col overflow-hidden relative">
       <header id="top-header" class="sticky top-0 z-30 transition-transform duration-300 bg-milktea/90 md:bg-white/60 backdrop-blur-md pt-safe">
         <div class="w-full max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between py-4">
-          <div class="flex space-x-3 hide-scroll-x flex-1 items-center" id="category-tabs"></div>      
+          <div class="flex space-x-3 hide-scroll-x flex-1 items-center" id="category-tabs"></div>
         </div>
       </header>
       
@@ -113,20 +113,15 @@
             </div>
           </div>
           
-          <!-- 文章文字內容 -->
           <div class="article-content text-gray-700 text-base md:text-lg leading-relaxed md:leading-loose mb-10" id="modal-content"></div>
-          
-          <!-- ★ 影片播放區塊 (若有 YouTube 或 Drive 影片會自動顯示於此) -->
           <div id="modal-videos" class="space-y-6 mb-8" style="display:none;"></div>
-          
-          <!-- ★ 照片畫廊區塊 (點擊可進入 Lightbox 放大) -->
           <div id="modal-gallery" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-8"></div>
         </div>
       </div>
     </div>
   </div>
   
-<!-- ================= 5. Lightbox 圖片與影片全螢幕放大 ================= -->
+  <!-- ================= 5. Lightbox 圖片與影片全螢幕放大 ================= -->
   <div id="lightbox" class="fixed inset-0 z-[70] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center opacity-0 transition-opacity duration-300" style="display:none;">
     <button id="btn-close-lightbox" class="absolute top-6 right-6 text-white p-3 z-30 bg-white/10 rounded-full hover:bg-white/20 transition active:scale-90"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
     <div id="lightbox-counter" class="absolute top-8 left-6 text-white/70 font-bold z-30 text-sm tracking-widest drop-shadow-md"></div>
@@ -136,13 +131,13 @@
     <!-- 主顯示區 -->
     <div class="w-full h-full flex items-center justify-center overflow-hidden pb-32 px-3 md:px-8 pt-20">
       <img id="lightbox-img" src="" draggable="false" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl select-none pointer-events-auto touch-none" style="transform: scale(0.95); transition: transform 0.3s ease;">
-      <!-- 影片外框：使用 100% 寬度搭配 16:9 比例盒，相容所有手機瀏覽器 -->
       <div id="lightbox-video-box" class="w-full max-w-3xl pointer-events-auto" style="display:none;"></div>
     </div>
     
     <div id="lightbox-caption" class="absolute bottom-[100px] w-full flex justify-center px-4 z-30 pointer-events-none"><span class="inline-block bg-black/40 backdrop-blur-md text-white/95 text-sm md:text-base font-medium tracking-widest px-5 py-2 rounded-full shadow-sm border border-white/20 transition-opacity duration-300" id="lightbox-caption-text"></span></div>
     <div id="lightbox-thumbnails" class="absolute bottom-6 w-full flex justify-center space-x-2 px-4 overflow-x-auto hide-scroll-x z-30"></div>
   </div>
+
   <script>
     var globalArticles = []; 
     var currentMainCategory = '行政'; 
@@ -153,7 +148,6 @@
     var lastTouchTime = 0, touchStartDistance = 0, isPinching = false, lastTouchX = 0, lastTouchY = 0;
     var lastScrollTop = 0;
     
-    // 手機版向下滾動時自動隱藏底部導覽列
     window.addEventListener('scroll', function() {
       var st = window.pageYOffset || document.documentElement.scrollTop;
       var bottomNav = document.getElementById('bottom-nav');
@@ -174,7 +168,6 @@
       } 
     }
 
-    // 全域點擊事件代理
     document.addEventListener('click', function(e) {
       if (e.target.closest('#btn-start-reading')) { 
         document.getElementById('splash-screen').style.opacity = '0'; 
@@ -215,7 +208,6 @@
       if (e.target.closest('#btn-next-img')) nextImage();
     });
 
-    // 手機觸控手勢支援 (滑動切換照片 / 下滑關閉彈窗)
     var touchStartX = 0, touchStartY = 0, touchStartScrollTop = 0;
     document.addEventListener('touchstart', function(e) { 
       touchStartX = e.changedTouches[0].clientX; 
@@ -244,14 +236,13 @@
       }
     }, {passive: true});
 
-function parseMediaItem(rawItem) {
+    function parseMediaItem(rawItem) {
       if (!rawItem || typeof rawItem !== 'string') return null;
       var parts = rawItem.split('|||');
       var url = parts[0].trim();
       var caption = parts.length > 1 ? parts[1].trim() : '';
       if (!url) return null;
 
-      // 1. 判斷是否為 YouTube 網址 (支援一般網址、縮網址、Shorts)
       var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/);
       if (ytMatch && ytMatch[1]) {
         var ytId = ytMatch[1];
@@ -263,7 +254,6 @@ function parseMediaItem(rawItem) {
         };
       }
 
-      // 2. 判斷是否為 Google Drive 影片 (帶有 #video 標記或影片副檔名)
       var isVideo = url.indexOf('#video') !== -1 || /\.(mp4|mov|webm)$/i.test(url);
       var cleanUrl = url.replace('#video', '');
       var driveMatch = cleanUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || cleanUrl.match(/id=([a-zA-Z0-9_-]+)/);
@@ -280,7 +270,6 @@ function parseMediaItem(rawItem) {
         };
       }
 
-      // 3. 一般圖片
       var safeImgUrl = (driveMatch && driveMatch[1]) ? 'https://lh3.googleusercontent.com/d/' + driveMatch[1] : cleanUrl;
       return {
         type: 'image',
@@ -312,7 +301,6 @@ function parseMediaItem(rawItem) {
         .then(function(data) { initApp(data); })
         .catch(function(err) { showError(err); });
 
-      // Lightbox 圖片雙擊與雙指縮放控制
       var lbImg = document.getElementById('lightbox-img');
       if (lbImg) {
         lbImg.addEventListener('dblclick', function(e) { 
@@ -370,7 +358,6 @@ function parseMediaItem(rawItem) {
       setMainCategory('行政', 'nav-admin');
     }
 
-    // ★ 已修復：切換主分類時徹底清除所有按鈕的殘留背景色
     function setMainCategory(mainCat, activeNavId) {
       currentMainCategory = mainCat; 
       currentSubCategory = '';
@@ -441,7 +428,6 @@ function parseMediaItem(rawItem) {
       renderArticles(filtered);
     }
 
-    // ★ 高密度卡片渲染 (支援圖片與影片縮圖疊加 + 播放小圖示)
     function renderArticles(articles) {
       var gridContainer = document.getElementById('subcat-grid'); 
       var listContainer = document.getElementById('article-list');
@@ -499,7 +485,6 @@ function parseMediaItem(rawItem) {
       });
     }
 
-// ★ 升級版：所有照片與影片統一顯示為底部小方框，點擊後進入全螢幕燈箱
     function openModal(articleId) {
       var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); 
       if(!article) return;
@@ -513,7 +498,6 @@ function parseMediaItem(rawItem) {
       document.getElementById('modal-date').innerText = article.publish_date || '';
       document.getElementById('modal-content').innerText = article.content || '';
       
-      // 確保舊的內嵌影片區隱藏
       var videoContainer = document.getElementById('modal-videos');
       if (videoContainer) { videoContainer.innerHTML = ''; videoContainer.style.display = 'none'; }
 
@@ -526,7 +510,6 @@ function parseMediaItem(rawItem) {
         });
       }
       
-      // 將所有媒體（包含照片與影片）存入燈箱佇列
       currentGalleryData = mediaItems;
       var galleryContainer = document.getElementById('modal-gallery');
       galleryContainer.innerHTML = '';
@@ -541,7 +524,6 @@ function parseMediaItem(rawItem) {
           if (m.thumbUrl) {
               innerHtml += '<img src="' + m.thumbUrl + '" class="w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity" onerror="this.style.display=\'none\'">';
           }
-          // 若為影片，在小方框中央加上精緻的播放圖示
           if (m.type === 'youtube' || m.type === 'drive_video') {
               innerHtml += '<div class="absolute inset-0 bg-black/30 flex items-center justify-center transition-transform hover:scale-105"><div class="w-10 h-10 rounded-full bg-white/90 text-morandi-dark flex items-center justify-center shadow-md"><svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>';
           }
@@ -598,7 +580,6 @@ function parseMediaItem(rawItem) {
       setTimeout(function() { lb.classList.remove('opacity-0'); }, 10);
     }
 
-    // ★ 關閉全螢幕燈箱時，自動清空影片容器切斷聲音，退回原本的小方框
     function closeLightbox() {
       var lb = document.getElementById('lightbox'); 
       var lbImg = document.getElementById('lightbox-img');
@@ -611,15 +592,16 @@ function parseMediaItem(rawItem) {
         if (videoBox) { videoBox.innerHTML = ''; videoBox.style.display = 'none'; }
       }, 300);
     }
-   
-// 當原生 <video> 因權限或轉碼尚未完成無法直連時，自動退回等比例縮放的 iframe 模式
+
     window.handleDriveVideoError = function(fileId) {
       var container = document.getElementById('drive-player-inner');
       if (!container) return;
-      container.innerHTML = 
-        '<iframe src="https://drive.google.com/file/d/' + fileId + '/preview" class="
-absolute inset-0 w-full h-full border-0" allow="autoplay; fullscreen" allowfullscreen></iframe>' +
-        '<div class="absolute top-0 right-0 w-14 h-14 bg-black z-20 pointer-events-auto select-none" onclick="event.stopPropagation(); return false;"></div>';
+      var clsFrame = 'absolute inset-0 w-full h-full border-0';
+      var clsMask = 'absolute top-0 right-0 w-14 h-14 bg-black z-20 pointer-events-auto select-none';
+      container.innerHTML = [
+        '<iframe src="https://drive.google.com/file/d/' + fileId + '/preview" class="' + clsFrame + '" allow="autoplay; fullscreen" allowfullscreen></iframe>',
+        '<div class="' + clsMask + '" onclick="event.stopPropagation(); return false;"></div>'
+      ].join('');
     };
 
     function updateLightboxImage() {
@@ -634,19 +616,23 @@ absolute inset-0 w-full h-full border-0" allow="autoplay; fullscreen" allowfulls
       if (currentData.type === 'youtube' || currentData.type === 'drive_video') {
         img.style.display = 'none';
         videoBox.style.display = 'block';
+        var wrapCls = 'relative w-full overflow-hidden rounded-2xl bg-black shadow-2xl border border-white/10';
         
         if (currentData.type === 'drive_video') {
-          // ★ 使用最穩定的 16:9 比例盒 (padding-top: 56.25%)，優先使用 HTML5 原生 <video> 播放器（無右上角按鈕、不破版）
-          videoBox.innerHTML = 
-            '<div id="drive-player-inner" class="relative w-full overflow-hidden rounded-2xl bg-black shadow-2xl border border-white/10" style="padding-top: 56.25%;">' +
-              '<video src="' + currentData.directUrl + '" poster="' + currentData.thumbUrl + '" controls playsinline webkit-playsinline class="absolute inset-0 w-full h-full object-contain bg-black" onerror="window.handleDriveVideoError(\'' + currentData.fileId + '\')"></video>' +
-            '</div>';
+          var vCls = 'absolute inset-0 w-full h-full object-contain bg-black';
+          videoBox.innerHTML = [
+            '<div id="drive-player-inner" class="' + wrapCls + '" style="padding-top: 56.25%;">',
+            '<video src="' + currentData.directUrl + '" poster="' + currentData.thumbUrl + '" controls playsinline webkit-playsinline class="' + vCls + '" onerror="window.handleDriveVideoError(\'' + currentData.fileId + '\')"></video>',
+            '</div>'
+          ].join('');
         } else {
-          // YouTube 16:9 比例盒
-          videoBox.innerHTML = 
-            '<div class="relative w-full overflow-hidden rounded-2xl bg-black shadow-2xl border border-white/10" style="padding-top: 56.25%;">' +
-              '<iframe src="' + currentData.embedUrl + '" class="absolute inset-0 w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>' +
-            '</div>';
+          var yCls = 'absolute inset-0 w-full h-full border-0';
+          var yAllow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+          videoBox.innerHTML = [
+            '<div class="' + wrapCls + '" style="padding-top: 56.25%;">',
+            '<iframe src="' + currentData.embedUrl + '" class="' + yCls + '" allow="' + yAllow + '" allowfullscreen></iframe>',
+            '</div>'
+          ].join('');
         }
       } else {
         if (videoBox) videoBox.style.display = 'none';
@@ -667,15 +653,18 @@ absolute inset-0 w-full h-full border-0" allow="autoplay; fullscreen" allowfulls
         captionEl.style.display = 'none'; 
       }
       
+      var thumbActiveCls = 'relative w-12 h-12 rounded-lg overflow-hidden transition-all duration-300 cursor-pointer flex-shrink-0 opacity-100 ring-2 ring-white scale-110 bg-gray-800 flex items-center justify-center';
+      var thumbIdleCls = 'relative w-12 h-12 rounded-lg overflow-hidden transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50 bg-gray-800 flex items-center justify-center';
+      
       document.getElementById('lightbox-counter').innerText = (currentLightboxIndex + 1) + ' / ' + currentGalleryData.length;
       currentGalleryData.forEach(function(_, i) {
         var thumb = document.getElementById('lb-thumb-' + i);
         if(thumb) {
           if (i === currentLightboxIndex) { 
-            thumb.className = 'relative w-12 h-12 rounded-lg overflow-hidden transition-all duration-300 cursor-pointer flex-shrink-0 opacity-100 ring-2 ring-white scale-110 bg-gray-800 flex items-center justify-center'; 
+            thumb.className = thumbActiveCls; 
             thumb.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'}); 
           } else { 
-            thumb.className = 'relative w-12 h-12 rounded-lg overflow-hidden transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50 bg-gray-800 flex items-center justify-center'; 
+            thumb.className = thumbIdleCls; 
           }
         }
       });
