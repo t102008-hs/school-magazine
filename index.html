@@ -41,7 +41,7 @@
     <button id="btn-start-reading" class="bg-morandi-dark text-white px-10 py-4 rounded-full shadow-lg font-bold text-lg tracking-wider hover:opacity-90 hover:scale-105 transition active:scale-95" style="display:none;">開始閱讀</button>
   </div>
   
-  <!-- ================= 2. 導覽列 (手機膠囊懸浮 / 電腦左側) ================= -->
+<!-- ================= 2. 導覽列 (手機膠囊懸浮 / 電腦左側) ================= -->
   <nav id="bottom-nav" class="fixed z-50 transition-transform duration-300 ease-in-out
               bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-[420px] bg-white/85 backdrop-blur-xl border border-white/60 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-2 py-2 flex justify-between items-center
               md:bottom-auto md:left-0 md:translate-x-0 md:w-64 md:h-screen md:rounded-none md:border-t-0 md:border-r md:border-white/40 md:bg-transparent md:shadow-none md:px-6 md:pt-12 md:flex-col md:justify-start md:items-stretch">
@@ -51,24 +51,24 @@
       <h2 class="text-sm font-bold text-morandi-dark/80 tracking-widest mt-1">數位校刊</h2>
     </div>
 
-    <div class="flex md:flex-col justify-around md:justify-start items-center md:items-stretch w-full md:space-y-3">
-      <button id="nav-admin" class="nav-btn flex flex-col md:flex-row items-center md:justify-start w-full transition-all duration-200 text-morandi-dark md:bg-white/60 md:p-3 md:rounded-2xl group shrink-0">
+    <div class="flex justify-between md:flex-col md:justify-start items-center md:items-stretch w-full md:space-y-3">
+      <button id="nav-admin" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-morandi-dark md:bg-white/60 md:p-3 md:rounded-2xl group">
         <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 10l7.1-6.3a1.3 1.3 0 0 1 1.8 0L20 10"></path><path d="M6 10v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-9"></path><path d="M10 21v-5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v5"></path></svg>
         <span class="text-[10px] md:text-base font-bold tracking-wider">行政</span>
       </button>
-      <button id="nav-lower" class="nav-btn flex flex-col md:flex-row items-center md:justify-start w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group shrink-0">
+      <button id="nav-lower" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group">
         <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22v-8"></path><path d="M12 14c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path><path d="M12 14c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path></svg>
         <span class="text-[10px] md:text-base font-bold tracking-wider">低年級</span>
       </button>
-      <button id="nav-middle" class="nav-btn flex flex-col md:flex-row items-center md:justify-start w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group shrink-0">
+      <button id="nav-middle" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group">
         <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22V6"></path><path d="M12 16c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path><path d="M12 11c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path><path d="M12 6c2.5 0 4-2 0-6-4 4-2.5 6 0 6z"></path></svg>
         <span class="text-[10px] md:text-base font-bold tracking-wider">中年級</span>
       </button>
-      <button id="nav-upper" class="nav-btn flex flex-col md:flex-row items-center md:justify-start w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group shrink-0">
+      <button id="nav-upper" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group">
         <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22v-6"></path><path d="M18 16a5 5 0 0 0-1.5-9.5 6 6 0 0 0-10 1 4.5 4.5 0 0 0 1.5 8.5 Z"></path></svg>
         <span class="text-[10px] md:text-base font-bold tracking-wider">高年級</span>
       </button>
-      <button id="nav-kinder" class="nav-btn flex flex-col md:flex-row items-center md:justify-start w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group shrink-0">
+      <button id="nav-kinder" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group">
         <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3s-6 5-6 10c0 4 3 7 6 7s6-3 6-7c0-5-6-10-6-10z"></path><path d="M9 12a4 4 0 0 0 0 5"></path></svg>
         <span class="text-[10px] md:text-base font-bold tracking-wider leading-tight">星光<br class="md:hidden">幼兒</span>
       </button>
@@ -76,7 +76,7 @@
 
     <!-- 電腦版後台登入按鈕 -->
     <div class="hidden md:flex mt-auto w-full pb-6 pt-4">
-      <a href="https://script.google.com/a/macros/tmail.hc.edu.tw/s/AKfycbyirrh5kS5_rp8bgyqts7ciy_PaLOBgiK84H7WaAVtnYs1OkCT3c_Kdn57diJFt_B-2/exec" target="_blank" class="w-full flex items-center justify-center gap-2 bg-white/40 hover:bg-white/70 text-gray-500 hover:text-morandi-dark font-bold py-3 rounded-2xl transition-colors shadow-sm border border-white/50">
+      <a href="【請換成後台專用網址】" target="_blank" class="w-full flex items-center justify-center gap-2 bg-white/40 hover:bg-white/70 text-gray-500 hover:text-morandi-dark font-bold py-3 rounded-2xl transition-colors shadow-sm border border-white/50">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
         <span class="tracking-wider">後台管理</span>
       </a>
