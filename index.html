@@ -79,13 +79,36 @@
         <span class="text-[10px] md:text-base font-bold tracking-wider">星光班及幼兒園</span>
       </button>
     </div>
+    <button id="nav-kinder" class="nav-btn flex flex-col md:flex-row items-center md:justify-start w-full transition-all duration-200 text-gray-400 scale-90 md:scale-100 md:hover:bg-gray-100 md:p-3 md:rounded-xl group">
+        <svg class="w-7 h-7 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3s-6 5-6 10c0 4 3 7 6 7s6-3 6-7c0-5-6-10-6-10z"></path><path d="M9 12a4 4 0 0 0 0 5"></path></svg>
+        <span class="text-[10px] md:text-base font-bold tracking-wider">星光班及幼兒園</span>
+      </button>
+    </div>
+    
+    <!-- ====== 新增：電腦版後台登入按鈕 ====== -->
+    <div class="hidden md:flex mt-auto w-full px-4 pb-6 pt-4">
+      <a href="【請換成後台專用網址】" target="_blank" class="w-full flex items-center justify-center gap-2 bg-gray-50 hover:bg-morandi-light text-gray-400 hover:text-morandi-dark font-bold py-3 rounded-xl transition-colors shadow-sm border border-gray-200">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+        <span class="tracking-wider">後台登入</span>
+      </a>
+    </div>
+    <!-- ====================================== -->
+    
+  </nav>
   </nav>
   
   <!-- ================= 3. 右側主內容區塊 ================= -->
   <div class="flex-1 flex flex-col min-h-screen md:ml-56">
-    <header class="sticky top-0 z-30 bg-white/70 backdrop-blur-md border-b border-gray-200">
-      <div class="w-full max-w-7xl mx-auto px-4 md:px-8">
-        <div class="flex space-x-2 py-3 hide-scroll-x" id="category-tabs"></div>
+<header class="sticky top-0 z-30 bg-white/70 backdrop-blur-md border-b border-gray-200">
+      <div class="w-full max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between">
+        <div class="flex space-x-2 py-3 hide-scroll-x flex-1" id="category-tabs"></div>
+        
+        <!-- ====== 新增：手機版後台登入按鈕 ====== -->
+        <a href="【請換成後台專用網址】" target="_blank" class="md:hidden ml-3 p-2 bg-gray-50 text-gray-400 rounded-full border border-gray-200 hover:text-morandi-dark hover:bg-morandi-light transition shadow-sm active:scale-95">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+        </a>
+        <!-- ====================================== -->
+        
       </div>
     </header>
     
