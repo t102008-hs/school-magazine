@@ -51,7 +51,7 @@
     </div>
 
     <div class="flex justify-between md:flex-col md:justify-start items-center md:items-stretch w-full md:space-y-3">
-      <button id="nav-admin" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-morandi-dark md:bg-white/60 md:p-3 md:rounded-2xl group">
+      <button id="nav-admin" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-morandi-dark md:bg-white/70 md:p-3 md:rounded-2xl group">
         <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 10l7.1-6.3a1.3 1.3 0 0 1 1.8 0L20 10"></path><path d="M6 10v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-9"></path><path d="M10 21v-5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v5"></path></svg>
         <span class="text-[10px] md:text-base font-bold tracking-wider">行政</span>
       </button>
@@ -69,7 +69,7 @@
       </button>
       <button id="nav-kinder" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group">
         <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3s-6 5-6 10c0 4 3 7 6 7s6-3 6-7c0-5-6-10-6-10z"></path><path d="M9 12a4 4 0 0 0 0 5"></path></svg>
-        <span class="text-[10px] md:text-base font-bold tracking-wider leading-tight">星光班<br class="md:hidden">幼兒園</span>
+        <span class="text-[10px] md:text-base font-bold tracking-wider leading-tight">星光<br class="md:hidden">幼兒</span>
       </button>
     </div>
 
@@ -116,9 +116,14 @@
               <span id="modal-author"></span><span id="modal-date"></span>
             </div>
           </div>
+          
+          <!-- 文章文字內容 -->
           <div class="article-content text-gray-700 text-base md:text-lg leading-relaxed md:leading-loose mb-10" id="modal-content"></div>
           
-          <!-- 所有照片都在這個畫廊區塊中 -->
+          <!-- ★ 影片播放區塊 (若有 YouTube 或 Drive 影片會自動顯示於此) -->
+          <div id="modal-videos" class="space-y-6 mb-8" style="display:none;"></div>
+          
+          <!-- ★ 照片畫廊區塊 (點擊可進入 Lightbox 放大) -->
           <div id="modal-gallery" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-8"></div>
         </div>
       </div>
@@ -137,47 +142,98 @@
   </div>
 
   <script>
-    var globalArticles = []; var currentMainCategory = '行政'; var currentSubCategory = '';
-    var currentGalleryData = []; var currentLightboxIndex = 0;
+    var globalArticles = []; 
+    var currentMainCategory = '行政'; 
+    var currentSubCategory = '';
+    var currentGalleryData = []; 
+    var currentLightboxIndex = 0;
     var imgScale = 1, imgTranslateX = 0, imgTranslateY = 0;
     var lastTouchTime = 0, touchStartDistance = 0, isPinching = false, lastTouchX = 0, lastTouchY = 0;
     var lastScrollTop = 0;
     
+    // 手機版向下滾動時自動隱藏底部導覽列
     window.addEventListener('scroll', function() {
       var st = window.pageYOffset || document.documentElement.scrollTop;
       var bottomNav = document.getElementById('bottom-nav');
-      if (st > lastScrollTop && st > 60) { bottomNav.classList.add('translate-y-[150%]'); } else { bottomNav.classList.remove('translate-y-[150%]'); }
+      if (st > lastScrollTop && st > 60) { 
+        bottomNav.classList.add('translate-y-[150%]'); 
+      } else { 
+        bottomNav.classList.remove('translate-y-[150%]'); 
+      }
       lastScrollTop = st <= 0 ? 0 : st;
     }, false);
 
-    function resetImageTransform() { imgScale = 1; imgTranslateX = 0; imgTranslateY = 0; var img = document.getElementById('lightbox-img'); if (img) { img.style.transition = 'transform 0.3s ease'; img.style.transform = 'translate(0px, 0px) scale(1)'; } }
+    function resetImageTransform() { 
+      imgScale = 1; imgTranslateX = 0; imgTranslateY = 0; 
+      var img = document.getElementById('lightbox-img'); 
+      if (img) { 
+        img.style.transition = 'transform 0.3s ease'; 
+        img.style.transform = 'translate(0px, 0px) scale(1)'; 
+      } 
+    }
 
+    // 全域點擊事件代理
     document.addEventListener('click', function(e) {
-      if (e.target.closest('#btn-start-reading')) { document.getElementById('splash-screen').style.opacity = '0'; setTimeout(function() { document.getElementById('splash-screen').style.display = 'none'; }, 500); return; }
+      if (e.target.closest('#btn-start-reading')) { 
+        document.getElementById('splash-screen').style.opacity = '0'; 
+        setTimeout(function() { document.getElementById('splash-screen').style.display = 'none'; }, 500); 
+        return; 
+      }
       var navBtn = e.target.closest('.nav-btn');
       if (navBtn) {
         var targetCat = '';
-        if (navBtn.id === 'nav-admin') targetCat = '行政'; else if (navBtn.id === 'nav-lower') targetCat = '低年級'; else if (navBtn.id === 'nav-middle') targetCat = '中年級'; else if (navBtn.id === 'nav-upper') targetCat = '高年級'; else if (navBtn.id === 'nav-kinder') targetCat = '星光班及幼兒園';
-        if (targetCat) setMainCategory(targetCat, navBtn.id); return;
+        if (navBtn.id === 'nav-admin') targetCat = '行政'; 
+        else if (navBtn.id === 'nav-lower') targetCat = '低年級'; 
+        else if (navBtn.id === 'nav-middle') targetCat = '中年級'; 
+        else if (navBtn.id === 'nav-upper') targetCat = '高年級'; 
+        else if (navBtn.id === 'nav-kinder') targetCat = '星光班及幼兒園';
+        if (targetCat) setMainCategory(targetCat, navBtn.id); 
+        return;
       }
-      var filterBtn = e.target.closest('.filter-btn'); if (filterBtn) { setSubCategory(filterBtn.innerText); return; }
-      var subCatCard = e.target.closest('.sub-cat-card'); if (subCatCard) { setSubCategory(subCatCard.querySelector('.cat-name').innerText); return; }
-      var card = e.target.closest('.article-card'); if (card) { openModal(card.id.replace('article-', '')); return; }
-      var thumb = e.target.closest('.gallery-thumb'); if (thumb) { openLightbox(parseInt(thumb.id.replace('thumb-', ''), 10)); return; }
-      var lbThumb = e.target.closest('[id^="lb-thumb-"]'); if (lbThumb) { currentLightboxIndex = parseInt(lbThumb.id.replace('lb-thumb-', ''), 10); updateLightboxImage(); return; }
-      if (e.target.id === 'article-modal') { closeModal(); return; } if (e.target.id === 'lightbox') { closeLightbox(); return; }
-      if (e.target.closest('#btn-close-modal')) closeModal(); if (e.target.closest('#btn-close-lightbox')) closeLightbox();
-      if (e.target.closest('#btn-prev-img')) prevImage(); if (e.target.closest('#btn-next-img')) nextImage();
+      var filterBtn = e.target.closest('.filter-btn'); 
+      if (filterBtn) { setSubCategory(filterBtn.innerText); return; }
+      
+      var subCatCard = e.target.closest('.sub-cat-card'); 
+      if (subCatCard) { setSubCategory(subCatCard.querySelector('.cat-name').innerText); return; }
+      
+      var card = e.target.closest('.article-card'); 
+      if (card) { openModal(card.id.replace('article-', '')); return; }
+      
+      var thumb = e.target.closest('.gallery-thumb'); 
+      if (thumb) { openLightbox(parseInt(thumb.id.replace('thumb-', ''), 10)); return; }
+      
+      var lbThumb = e.target.closest('[id^="lb-thumb-"]'); 
+      if (lbThumb) { currentLightboxIndex = parseInt(lbThumb.id.replace('lb-thumb-', ''), 10); updateLightboxImage(); return; }
+      
+      if (e.target.id === 'article-modal') { closeModal(); return; } 
+      if (e.target.id === 'lightbox') { closeLightbox(); return; }
+      if (e.target.closest('#btn-close-modal')) closeModal(); 
+      if (e.target.closest('#btn-close-lightbox')) closeLightbox();
+      if (e.target.closest('#btn-prev-img')) prevImage(); 
+      if (e.target.closest('#btn-next-img')) nextImage();
     });
 
+    // 手機觸控手勢支援 (滑動切換照片 / 下滑關閉彈窗)
     var touchStartX = 0, touchStartY = 0, touchStartScrollTop = 0;
-    document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].clientX; touchStartY = e.changedTouches[0].clientY; var modalInner = document.getElementById('modal-inner'); if (modalInner) touchStartScrollTop = modalInner.scrollTop; }, {passive: true});
+    document.addEventListener('touchstart', function(e) { 
+      touchStartX = e.changedTouches[0].clientX; 
+      touchStartY = e.changedTouches[0].clientY; 
+      var modalInner = document.getElementById('modal-inner'); 
+      if (modalInner) touchStartScrollTop = modalInner.scrollTop; 
+    }, {passive: true});
+    
     document.addEventListener('touchend', function(e) {
-      var diffX = e.changedTouches[0].clientX - touchStartX; var diffY = e.changedTouches[0].clientY - touchStartY;
+      var diffX = e.changedTouches[0].clientX - touchStartX; 
+      var diffY = e.changedTouches[0].clientY - touchStartY;
       var lb = document.getElementById('lightbox');
       if (lb && lb.style.display !== 'none') {
         if (imgScale > 1) return;
-        if (diffY > 80 && Math.abs(diffY) > Math.abs(diffX)) { closeLightbox(); } else if (Math.abs(diffY) < 60) { if (diffX < -50) nextImage(); if (diffX > 50) prevImage(); } return;
+        if (diffY > 80 && Math.abs(diffY) > Math.abs(diffX)) { closeLightbox(); } 
+        else if (Math.abs(diffY) < 60) { 
+          if (diffX < -50) nextImage(); 
+          if (diffX > 50) prevImage(); 
+        } 
+        return;
       }
       var modal = document.getElementById('article-modal');
       if (modal && modal.style.display !== 'none') {
@@ -186,12 +242,49 @@
       }
     }, {passive: true});
 
-    function formatDriveUrl(url) {
-      if (!url || typeof url !== 'string') return '';
-      if (!url.includes('drive.google.com')) return url;
-      var match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-      if (match && match[1]) return 'https://lh3.googleusercontent.com/d/' + match[1];
-      return url;
+    // ★ 全方位媒體解析器 (自動辨識圖片、Drive 影片、YouTube)
+    function parseMediaItem(rawItem) {
+      if (!rawItem || typeof rawItem !== 'string') return null;
+      var parts = rawItem.split('|||');
+      var url = parts[0].trim();
+      var caption = parts.length > 1 ? parts[1].trim() : '';
+      if (!url) return null;
+
+      // 1. 判斷是否為 YouTube 網址 (支援一般網址、縮網址、Shorts)
+      var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/);
+      if (ytMatch && ytMatch[1]) {
+        var ytId = ytMatch[1];
+        return {
+          type: 'youtube',
+          embedUrl: 'https://www.youtube.com/embed/' + ytId + '?rel=0',
+          thumbUrl: 'https://img.youtube.com/vi/' + ytId + '/hqdefault.jpg',
+          caption: caption
+        };
+      }
+
+      // 2. 判斷是否為 Google Drive 影片 (帶有 #video 標記或影片副檔名)
+      var isVideo = url.includes('#video') || /\.(mp4|mov|webm)$/i.test(url);
+      var cleanUrl = url.replace('#video', '');
+      var driveMatch = cleanUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || cleanUrl.match(/id=([a-zA-Z0-9_-]+)/);
+
+      if (isVideo && driveMatch && driveMatch[1]) {
+        var fileId = driveMatch[1];
+        return {
+          type: 'drive_video',
+          embedUrl: 'https://drive.google.com/file/d/' + fileId + '/preview',
+          thumbUrl: 'https://lh3.googleusercontent.com/d/' + fileId + '=s400',
+          caption: caption
+        };
+      }
+
+      // 3. 一般圖片
+      var safeImgUrl = (driveMatch && driveMatch[1]) ? 'https://lh3.googleusercontent.com/d/' + driveMatch[1] : cleanUrl;
+      return {
+        type: 'image',
+        url: safeImgUrl,
+        thumbUrl: safeImgUrl,
+        caption: caption
+      };
     }
 
     function sortSubCategories(subs) {
@@ -200,98 +293,139 @@
         var weightA = 999, weightB = 999;
         for (var key in orderMap) { if (a.indexOf(key) !== -1) weightA = orderMap[key]; }
         for (var key in orderMap) { if (b.indexOf(key) !== -1) weightB = orderMap[key]; }
-        if (weightA !== weightB) return weightA - weightB; return a.localeCompare(b, 'zh-TW', { numeric: true });
+        if (weightA !== weightB) return weightA - weightB; 
+        return a.localeCompare(b, 'zh-TW', { numeric: true });
       });
     }
 
     window.onload = function() {
       // ⚠️ 記得換成你的完全公開版 API 網址！
       var API_URL = 'https://script.google.com/macros/s/AKfycbx0WYcfguRrU0oj-BMRjnwrz6LySteDiy7ZMuF4WnaoKFJoqtL3nF3Bpe0M7bm2PG9Z/exec?api=true'; 
-      var loadingEl = document.getElementById('splash-loading'); if (loadingEl) loadingEl.style.display = 'flex';
-      fetch(API_URL).then(function(res) { return res.json(); }).then(function(data) { initApp(data); }).catch(function(err) { showError(err); });
+      var loadingEl = document.getElementById('splash-loading'); 
+      if (loadingEl) loadingEl.style.display = 'flex';
+      
+      fetch(API_URL)
+        .then(function(res) { return res.json(); })
+        .then(function(data) { initApp(data); })
+        .catch(function(err) { showError(err); });
 
+      // Lightbox 圖片雙擊與雙指縮放控制
       var lbImg = document.getElementById('lightbox-img');
       if (lbImg) {
-        lbImg.addEventListener('dblclick', function(e) { if (imgScale > 1) { resetImageTransform(); } else { imgScale = 2.5; lbImg.style.transition = 'transform 0.3s ease'; lbImg.style.transform = 'translate(0px, 0px) scale(' + imgScale + ')'; } });
+        lbImg.addEventListener('dblclick', function(e) { 
+          if (imgScale > 1) { resetImageTransform(); } 
+          else { imgScale = 2.5; lbImg.style.transition = 'transform 0.3s ease'; lbImg.style.transform = 'translate(0px, 0px) scale(' + imgScale + ')'; } 
+        });
         lbImg.addEventListener('touchstart', function(e) {
           if (e.touches.length === 1) {
             var tapLength = new Date().getTime() - lastTouchTime;
-            if (tapLength < 300 && tapLength > 0) { e.preventDefault(); if (imgScale > 1) { resetImageTransform(); } else { imgScale = 2.5; lbImg.style.transition = 'transform 0.3s ease'; lbImg.style.transform = 'translate(0px, 0px) scale(' + imgScale + ')'; } } 
-            else { lbImg.style.transition = 'none'; lastTouchX = e.touches[0].clientX; lastTouchY = e.touches[0].clientY; }
+            if (tapLength < 300 && tapLength > 0) { 
+              e.preventDefault(); 
+              if (imgScale > 1) { resetImageTransform(); } 
+              else { imgScale = 2.5; lbImg.style.transition = 'transform 0.3s ease'; lbImg.style.transform = 'translate(0px, 0px) scale(' + imgScale + ')'; } 
+            } else { 
+              lbImg.style.transition = 'none'; 
+              lastTouchX = e.touches[0].clientX; 
+              lastTouchY = e.touches[0].clientY; 
+            }
             lastTouchTime = new Date().getTime();
-          } else if (e.touches.length === 2) { e.preventDefault(); isPinching = true; lbImg.style.transition = 'none'; touchStartDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); }
+          } else if (e.touches.length === 2) { 
+            e.preventDefault(); 
+            isPinching = true; 
+            lbImg.style.transition = 'none'; 
+            touchStartDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); 
+          }
         }, {passive: false});
         lbImg.addEventListener('touchmove', function(e) {
           if (e.touches.length === 1 && imgScale > 1 && !isPinching) {
             e.preventDefault(); e.stopPropagation();
-            imgTranslateX += e.touches[0].clientX - lastTouchX; imgTranslateY += e.touches[0].clientY - lastTouchY;
-            lastTouchX = e.touches[0].clientX; lastTouchY = e.touches[0].clientY;
+            imgTranslateX += e.touches[0].clientX - lastTouchX; 
+            imgTranslateY += e.touches[0].clientY - lastTouchY;
+            lastTouchX = e.touches[0].clientX; 
+            lastTouchY = e.touches[0].clientY;
             lbImg.style.transform = 'translate(' + imgTranslateX + 'px, ' + imgTranslateY + 'px) scale(' + imgScale + ')';
           } else if (e.touches.length === 2) {
             e.preventDefault(); e.stopPropagation();
             var curDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-            imgScale = Math.min(Math.max(1, imgScale * (curDist / touchStartDistance)), 5); touchStartDistance = curDist;
+            imgScale = Math.min(Math.max(1, imgScale * (curDist / touchStartDistance)), 5); 
+            touchStartDistance = curDist;
             lbImg.style.transform = 'translate(' + imgTranslateX + 'px, ' + imgTranslateY + 'px) scale(' + imgScale + ')';
           }
         }, {passive: false});
-        lbImg.addEventListener('touchend', function(e) { if (e.touches.length < 2) isPinching = false; if (imgScale < 1) resetImageTransform(); }, {passive: true});
+        lbImg.addEventListener('touchend', function(e) { 
+          if (e.touches.length < 2) isPinching = false; 
+          if (imgScale < 1) resetImageTransform(); 
+        }, {passive: true});
       }
     };
 
     function initApp(articles) {
-      articles.forEach(function(a, idx) { if (!a.id) a.id = 'auto-' + idx; }); globalArticles = articles;
-      document.getElementById('splash-loading').style.display = 'none'; document.getElementById('btn-start-reading').style.display = 'block'; setMainCategory('行政', 'nav-admin');
+      articles.forEach(function(a, idx) { if (!a.id) a.id = 'auto-' + idx; }); 
+      globalArticles = articles;
+      document.getElementById('splash-loading').style.display = 'none'; 
+      document.getElementById('btn-start-reading').style.display = 'block'; 
+      setMainCategory('行政', 'nav-admin');
     }
 
-function setMainCategory(mainCat, activeNavId) {
+    // ★ 已修復：切換主分類時徹底清除所有按鈕的殘留背景色
+    function setMainCategory(mainCat, activeNavId) {
       currentMainCategory = mainCat; 
       currentSubCategory = '';
-      
       document.querySelectorAll('.nav-btn').forEach(function(btn) {
-        // ★ 關鍵修復：徹底清除所有可能殘留的狀態（包含寫死在 HTML 的 md:bg-white/60）
         btn.classList.remove('text-morandi-dark', 'md:bg-white/60', 'md:bg-white/70', 'text-gray-400', 'md:hover:bg-white/40');
-        
         if (btn.id === activeNavId) { 
-          // 被選中的按鈕：深色字 + 實體白底
           btn.classList.add('text-morandi-dark', 'md:bg-white/70'); 
         } else { 
-          // 沒被選中的按鈕：淺灰字 + 懸浮效果
           btn.classList.add('text-gray-400', 'md:hover:bg-white/40'); 
         }
       });
-      
       var subs = []; 
       globalArticles.forEach(function(a) { 
         if (a.main_category === mainCat && a.sub_category && !subs.includes(a.sub_category)) subs.push(a.sub_category); 
       });
-      renderTabs(sortSubCategories(subs)); 
-      renderSubCategoryGrid(sortSubCategories(subs));
+      var sortedSubs = sortSubCategories(subs);
+      renderTabs(sortedSubs); 
+      renderSubCategoryGrid(sortedSubs);
     }
 
     function setSubCategory(subCat) {
-      currentSubCategory = subCat; var subs = [];
-      globalArticles.forEach(function(a) { if (a.main_category === currentMainCategory && a.sub_category && !subs.includes(a.sub_category)) subs.push(a.sub_category); });
-      renderTabs(sortSubCategories(subs)); filterArticles();
+      currentSubCategory = subCat; 
+      var subs = [];
+      globalArticles.forEach(function(a) { 
+        if (a.main_category === currentMainCategory && a.sub_category && !subs.includes(a.sub_category)) subs.push(a.sub_category); 
+      });
+      renderTabs(sortSubCategories(subs)); 
+      filterArticles();
     }
 
     function renderTabs(categories) {
-      var container = document.getElementById('category-tabs'); container.innerHTML = '';
+      var container = document.getElementById('category-tabs'); 
+      container.innerHTML = '';
       if (categories.length === 0) { container.style.display = 'none'; return; }
       container.style.display = 'flex';
       categories.forEach(function(cat) {
         var btn = document.createElement('button');
         var style = (cat === currentSubCategory) ? 'bg-morandi-dark text-white shadow-md' : 'bg-white text-gray-500 border border-white/50 hover:bg-morandi-light hover:text-morandi-dark shadow-sm';
         btn.className = 'filter-btn whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold tracking-wide transition-colors ' + style;
-        btn.innerText = cat; container.appendChild(btn);
+        btn.innerText = cat; 
+        container.appendChild(btn);
       });
     }
 
     function renderSubCategoryGrid(subs) {
-      var gridContainer = document.getElementById('subcat-grid'); var listContainer = document.getElementById('article-list');
-      listContainer.style.display = 'none'; gridContainer.style.display = 'grid'; gridContainer.innerHTML = '';
-      if (subs.length === 0) { gridContainer.style.display = 'block'; gridContainer.innerHTML = '<div class="text-center p-8 bg-white/60 rounded-3xl border border-white mt-12 shadow-sm"><p class="text-gray-500 font-bold text-lg">這個分類目前沒有內容喔！</p></div>'; return; }
+      var gridContainer = document.getElementById('subcat-grid'); 
+      var listContainer = document.getElementById('article-list');
+      listContainer.style.display = 'none'; 
+      gridContainer.style.display = 'grid'; 
+      gridContainer.innerHTML = '';
+      if (subs.length === 0) { 
+        gridContainer.style.display = 'block'; 
+        gridContainer.innerHTML = '<div class="text-center p-8 bg-white/60 rounded-3xl border border-white mt-12 shadow-sm"><p class="text-gray-500 font-bold text-lg">這個分類目前沒有內容喔！</p></div>'; 
+        return; 
+      }
       subs.forEach(function(sub, index) {
-        var card = document.createElement('div'); var colors = ['bg-morandi-taupe', 'bg-morandi-pink', 'bg-morandi-pink', 'bg-morandi-taupe'];
+        var card = document.createElement('div'); 
+        var colors = ['bg-morandi-taupe', 'bg-morandi-pink', 'bg-morandi-pink', 'bg-morandi-taupe'];
         card.className = 'sub-cat-card backdrop-blur-md rounded-3xl py-6 px-2 md:py-8 md:px-4 shadow-sm border border-white/30 cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95 flex items-center justify-center text-center ' + colors[index % 4] + ' hover:opacity-90';
         card.innerHTML = '<h3 class="cat-name text-lg md:text-2xl lg:text-3xl font-bold text-white tracking-wider md:tracking-[0.2em] drop-shadow-sm">' + sub + '</h3>';
         gridContainer.appendChild(card);
@@ -304,24 +438,32 @@ function setMainCategory(mainCat, activeNavId) {
       renderArticles(filtered);
     }
 
-    // ★ 重構：高資訊密度的精巧版卡片排版
-function renderArticles(articles) {
-      var gridContainer = document.getElementById('subcat-grid'); var listContainer = document.getElementById('article-list');
-      gridContainer.style.display = 'none'; listContainer.style.display = 'grid'; listContainer.innerHTML = '';
-      if (!articles || articles.length === 0) { listContainer.style.display = 'block'; listContainer.innerHTML = '<div class="text-center p-8 bg-white/60 rounded-3xl border border-white mt-12 shadow-sm"><p class="text-gray-500 font-bold text-lg">這個分類目前沒有文章喔！</p></div>'; return; }
+    // ★ 高密度卡片渲染 (支援圖片與影片縮圖疊加 + 播放小圖示)
+    function renderArticles(articles) {
+      var gridContainer = document.getElementById('subcat-grid'); 
+      var listContainer = document.getElementById('article-list');
+      gridContainer.style.display = 'none'; 
+      listContainer.style.display = 'grid'; 
+      listContainer.innerHTML = '';
+      if (!articles || articles.length === 0) { 
+        listContainer.style.display = 'block'; 
+        listContainer.innerHTML = '<div class="text-center p-8 bg-white/60 rounded-3xl border border-white mt-12 shadow-sm"><p class="text-gray-500 font-bold text-lg">這個分類目前沒有文章喔！</p></div>'; 
+        return; 
+      }
       
       articles.forEach(function(article) {
         var card = document.createElement('div');
         card.className = 'article-card bg-white/80 backdrop-blur-sm rounded-[1.5rem] p-4 md:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-white cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95 flex flex-col h-full justify-between';
         card.id = 'article-' + article.id;
         
-        var allImages = [];
-        // 徹底移除 cover_image 判斷，全數由 gallery 提取
+        var mediaList = [];
         if (article.gallery) {
           var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
-          items.forEach(function(item) { var url = formatDriveUrl(item.split('|||')[0]); if (url) allImages.push(url); });
+          items.forEach(function(item) { 
+            var parsed = parseMediaItem(item); 
+            if (parsed) mediaList.push(parsed); 
+          });
         }
-        allImages = allImages.filter(function(item, pos) { return allImages.indexOf(item) == pos; });
         
         var contentHtml = '<div class="flex justify-between items-start gap-4 flex-1">';
         contentHtml += '<div class="flex-1 flex flex-col">';
@@ -329,96 +471,177 @@ function renderArticles(articles) {
         if (article.title) contentHtml += '<h2 class="text-base md:text-lg font-bold text-gray-800 line-clamp-3 leading-snug">' + article.title + '</h2>';
         contentHtml += '</div>';
         
-        if (allImages.length > 0) {
+        if (mediaList.length > 0) {
             contentHtml += '<div class="relative w-20 h-20 md:w-24 md:h-24 shrink-0">';
-            var displayCount = Math.min(allImages.length, 3);
+            var displayCount = Math.min(mediaList.length, 3);
             for (var i = displayCount - 1; i >= 0; i--) {
-                contentHtml += '<div class="absolute rounded-xl shadow-sm border-[2px] border-white overflow-hidden bg-gray-100" style="width:calc(100% - 6px); height:calc(100% - 6px); top:' + (i * 3) + 'px; right:' + ((displayCount - 1 - i) * 3) + 'px; z-index:' + (30 - i * 10) + '">';
-                contentHtml += '<img src="' + allImages[i] + '" class="w-full h-full object-cover"></div>';
+                var m = mediaList[i];
+                contentHtml += '<div class="absolute rounded-xl shadow-sm border-[2px] border-white overflow-hidden bg-gray-900 flex items-center justify-center" style="width:calc(100% - 6px); height:calc(100% - 6px); top:' + (i * 3) + 'px; right:' + ((displayCount - 1 - i) * 3) + 'px; z-index:' + (30 - i * 10) + '">';
+                if (m.thumbUrl) {
+                    contentHtml += '<img src="' + m.thumbUrl + '" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
+                }
+                if (m.type === 'youtube' || m.type === 'drive_video') {
+                    contentHtml += '<div class="absolute inset-0 bg-black/30 flex items-center justify-center"><div class="w-7 h-7 rounded-full bg-white/90 text-morandi-dark flex items-center justify-center shadow"><svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>';
+                }
+                contentHtml += '</div>';
             }
             contentHtml += '</div>';
         }
         contentHtml += '</div>';
+        
         if (article.author) contentHtml += '<div class="mt-3 pt-3 border-t border-gray-100/80 text-right shrink-0"><span class="text-xs md:text-sm font-bold text-gray-400">作者 / ' + article.author + '</span></div>';
         
-        card.innerHTML = contentHtml; listContainer.appendChild(card);
+        card.innerHTML = contentHtml; 
+        listContainer.appendChild(card);
       });
     }
 
+    // ★ 彈窗支援獨立影片播放器與相簿分流呈現
     function openModal(articleId) {
-      var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); if(!article) return;
+      var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); 
+      if(!article) return;
+      
       document.getElementById('modal-category').innerText = article.sub_category || article.main_category || '未分類';
       var modalTitle = document.getElementById('modal-title');
-      if (article.title) { modalTitle.innerText = article.title; modalTitle.style.display = 'block'; } else { modalTitle.style.display = 'none'; }
+      if (article.title) { modalTitle.innerText = article.title; modalTitle.style.display = 'block'; } 
+      else { modalTitle.style.display = 'none'; }
+      
       document.getElementById('modal-author').innerText = article.author ? '作者 / ' + article.author : '';
       document.getElementById('modal-date').innerText = article.publish_date || '';
       document.getElementById('modal-content').innerText = article.content || '';
       
-      var allImages = [];
-      // 徹底移除 cover_image 判斷
+      var videos = [];
+      var images = [];
       if (article.gallery) {
         var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
         items.forEach(function(item) {
-          var parts = item.split('|||'); var safeUrl = formatDriveUrl(parts[0]);
-          if (safeUrl) allImages.push({ safeUrl: safeUrl, caption: parts.length > 1 ? parts[1] : '' });
+          var parsed = parseMediaItem(item);
+          if (parsed) {
+            if (parsed.type === 'youtube' || parsed.type === 'drive_video') videos.push(parsed);
+            else images.push(parsed);
+          }
         });
       }
       
-      currentGalleryData = allImages.map(img => ({ url: img.safeUrl, caption: img.caption }));
+      // 渲染 16:9 影片播放器
+      var videoContainer = document.getElementById('modal-videos');
+      videoContainer.innerHTML = '';
+      if (videos.length > 0) {
+        videoContainer.style.display = 'block';
+        videos.forEach(function(v) {
+          var vWrapper = document.createElement('div');
+          vWrapper.className = 'w-full aspect-video rounded-2xl overflow-hidden shadow-md bg-black border border-gray-100';
+          vWrapper.innerHTML = '<iframe src="' + v.embedUrl + '" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+          videoContainer.appendChild(vWrapper);
+        });
+      } else {
+        videoContainer.style.display = 'none';
+      }
+
+      // 渲染底部照片畫廊 (可點擊進入 Lightbox 放大)
+      currentGalleryData = images.map(function(img) { return { url: img.url, caption: img.caption }; });
       var galleryContainer = document.getElementById('modal-gallery');
       galleryContainer.innerHTML = '';
       
-      for (var i = 0; i < allImages.length; i++) {
+      for (var i = 0; i < images.length; i++) {
           var gDiv = document.createElement('div');
           gDiv.className = 'gallery-thumb w-full aspect-square bg-gray-100 overflow-hidden cursor-pointer rounded-xl hover:ring-2 hover:ring-morandi-taupe transition-all';
           gDiv.id = 'thumb-' + i;
           var gImg = document.createElement('img');
-          gImg.src = allImages[i].safeUrl; gImg.className = 'w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity';
-          gDiv.appendChild(gImg); galleryContainer.appendChild(gDiv);
+          gImg.src = images[i].thumbUrl; 
+          gImg.className = 'w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity';
+          gDiv.appendChild(gImg); 
+          galleryContainer.appendChild(gDiv);
       }
       
-      var modal = document.getElementById('article-modal'); modal.style.display = 'flex'; document.body.classList.add('modal-open');
-      setTimeout(function() { modal.classList.remove('translate-x-full'); modal.classList.remove('md:opacity-0'); }, 10);
-      var modalInner = document.getElementById('modal-inner'); if (modalInner) modalInner.scrollTop = 0;
+      var modal = document.getElementById('article-modal'); 
+      modal.style.display = 'flex'; 
+      document.body.classList.add('modal-open');
+      setTimeout(function() { 
+        modal.classList.remove('translate-x-full'); 
+        modal.classList.remove('md:opacity-0'); 
+      }, 10);
+      var modalInner = document.getElementById('modal-inner'); 
+      if (modalInner) modalInner.scrollTop = 0;
     }
 
+    // ★ 關閉彈窗時自動停止影片播放 (避免背景繼續發出聲音)
     function closeModal() {
-      var modal = document.getElementById('article-modal'); modal.classList.add('translate-x-full'); modal.classList.add('md:opacity-0');
-      setTimeout(function() { modal.style.display = 'none'; document.body.classList.remove('modal-open'); }, 300);
+      var modal = document.getElementById('article-modal'); 
+      modal.classList.add('translate-x-full'); 
+      modal.classList.add('md:opacity-0');
+      setTimeout(function() { 
+        modal.style.display = 'none'; 
+        document.body.classList.remove('modal-open'); 
+        var videoContainer = document.getElementById('modal-videos');
+        if (videoContainer) {
+          videoContainer.innerHTML = ''; 
+          videoContainer.style.display = 'none';
+        }
+      }, 300);
     }
    
     function openLightbox(index) {
       if(currentGalleryData.length === 0) return;
       currentLightboxIndex = index;
-      var tbContainer = document.getElementById('lightbox-thumbnails'); tbContainer.innerHTML = '';
+      var tbContainer = document.getElementById('lightbox-thumbnails'); 
+      tbContainer.innerHTML = '';
       currentGalleryData.forEach(function(data, i) {
-        var img = document.createElement('img'); img.src = data.url; img.id = 'lb-thumb-' + i;
+        var img = document.createElement('img'); 
+        img.src = data.url; 
+        img.id = 'lb-thumb-' + i;
         img.className = 'w-12 h-12 rounded-lg object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50';
         tbContainer.appendChild(img);
       });
       updateLightboxImage();
-      var lb = document.getElementById('lightbox'); var lbImg = document.getElementById('lightbox-img');
-      lb.style.display = 'flex'; setTimeout(function() { lb.classList.remove('opacity-0'); lbImg.style.transition = 'transform 0.3s ease'; lbImg.style.transform = 'scale(1)'; }, 10);
+      var lb = document.getElementById('lightbox'); 
+      var lbImg = document.getElementById('lightbox-img');
+      lb.style.display = 'flex'; 
+      setTimeout(function() { 
+        lb.classList.remove('opacity-0'); 
+        lbImg.style.transition = 'transform 0.3s ease'; 
+        lbImg.style.transform = 'scale(1)'; 
+      }, 10);
     }
 
     function closeLightbox() {
-      var lb = document.getElementById('lightbox'); var lbImg = document.getElementById('lightbox-img');
-      resetImageTransform(); lb.classList.add('opacity-0'); lbImg.style.transition = 'transform 0.3s ease'; lbImg.style.transform = 'scale(0.95)';
+      var lb = document.getElementById('lightbox'); 
+      var lbImg = document.getElementById('lightbox-img');
+      resetImageTransform(); 
+      lb.classList.add('opacity-0'); 
+      lbImg.style.transition = 'transform 0.3s ease'; 
+      lbImg.style.transform = 'scale(0.95)';
       setTimeout(function() { lb.style.display = 'none'; }, 300);
     }
    
     function updateLightboxImage() {
-      resetImageTransform(); var img = document.getElementById('lightbox-img'); var captionEl = document.getElementById('lightbox-caption-text');
+      resetImageTransform(); 
+      var img = document.getElementById('lightbox-img'); 
+      var captionEl = document.getElementById('lightbox-caption-text');
       var currentData = currentGalleryData[currentLightboxIndex];
-      img.style.transition = 'transform 0.1s ease'; img.style.transform = 'scale(0.95)'; img.src = currentData.url;
-      if (currentData.caption) { captionEl.innerText = currentData.caption; captionEl.style.display = 'inline-block'; } else { captionEl.style.display = 'none'; }
-      setTimeout(function() { img.style.transition = 'transform 0.3s ease'; img.style.transform = 'scale(1)'; }, 50);
+      img.style.transition = 'transform 0.1s ease'; 
+      img.style.transform = 'scale(0.95)'; 
+      img.src = currentData.url;
+      if (currentData.caption) { 
+        captionEl.innerText = currentData.caption; 
+        captionEl.style.display = 'inline-block'; 
+      } else { 
+        captionEl.style.display = 'none'; 
+      }
+      setTimeout(function() { 
+        img.style.transition = 'transform 0.3s ease'; 
+        img.style.transform = 'scale(1)'; 
+      }, 50);
       document.getElementById('lightbox-counter').innerText = (currentLightboxIndex + 1) + ' / ' + currentGalleryData.length;
       currentGalleryData.forEach(function(_, i) {
         var thumb = document.getElementById('lb-thumb-' + i);
         if(thumb) {
-          if (i === currentLightboxIndex) { thumb.className = 'w-12 h-12 rounded-lg object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-100 ring-2 ring-white scale-110'; thumb.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'}); } 
-          else { thumb.className = 'w-12 h-12 rounded-lg object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50'; }
+          if (i === currentLightboxIndex) { 
+            thumb.className = 'w-12 h-12 rounded-lg object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-100 ring-2 ring-white scale-110'; 
+            thumb.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'}); 
+          } else { 
+            thumb.className = 'w-12 h-12 rounded-lg object-cover transition-all duration-300 cursor-pointer flex-shrink-0 opacity-50'; 
+          }
         }
       });
     }
