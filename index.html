@@ -406,6 +406,7 @@ window.onload = function() {
         if (e.touches.length < 2) isPinching = false;
         if (imgScale < 1) resetImageTransform();
       }, {passive: true});
+     }
     };
 
     function initApp(articles) {
@@ -742,8 +743,7 @@ function updateLightboxImage() {
     function prevImage() { if (currentLightboxIndex > 0) { currentLightboxIndex--; updateLightboxImage(); } }
     function nextImage() { if (currentLightboxIndex < currentGalleryData.length - 1) { currentLightboxIndex++; updateLightboxImage(); } }
     function showError(error) { 
-      document.getElementById('splash-loading').innerHTML = '<p class="text-red-500 font-bold text-center">載入失敗<br>請重新整理</p>'; 
-    }
+      document.getElementById('splash-loading').innerHTML = '<p class="text-red-500 font-bold text-center">載入失敗<br>請重新整理</p>';  }
   </script>
 </body>
 </html>
