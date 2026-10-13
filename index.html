@@ -243,14 +243,29 @@
       document.getElementById('splash-loading').style.display = 'none'; document.getElementById('btn-start-reading').style.display = 'block'; setMainCategory('行政', 'nav-admin');
     }
 
-    function setMainCategory(mainCat, activeNavId) {
-      currentMainCategory = mainCat; currentSubCategory = '';
+function setMainCategory(mainCat, activeNavId) {
+      currentMainCategory = mainCat; 
+      currentSubCategory = '';
+      
       document.querySelectorAll('.nav-btn').forEach(function(btn) {
-        if (btn.id === activeNavId) { btn.classList.add('text-morandi-dark', 'md:bg-white/70'); btn.classList.remove('text-gray-400', 'md:hover:bg-white/40'); } 
-        else { btn.classList.remove('text-morandi-dark', 'md:bg-white/70'); btn.classList.add('text-gray-400', 'md:hover:bg-white/40'); }
+        // ★ 關鍵修復：徹底清除所有可能殘留的狀態（包含寫死在 HTML 的 md:bg-white/60）
+        btn.classList.remove('text-morandi-dark', 'md:bg-white/60', 'md:bg-white/70', 'text-gray-400', 'md:hover:bg-white/40');
+        
+        if (btn.id === activeNavId) { 
+          // 被選中的按鈕：深色字 + 實體白底
+          btn.classList.add('text-morandi-dark', 'md:bg-white/70'); 
+        } else { 
+          // 沒被選中的按鈕：淺灰字 + 懸浮效果
+          btn.classList.add('text-gray-400', 'md:hover:bg-white/40'); 
+        }
       });
-      var subs = []; globalArticles.forEach(function(a) { if (a.main_category === mainCat && a.sub_category && !subs.includes(a.sub_category)) subs.push(a.sub_category); });
-      renderTabs(sortSubCategories(subs)); renderSubCategoryGrid(sortSubCategories(subs));
+      
+      var subs = []; 
+      globalArticles.forEach(function(a) { 
+        if (a.main_category === mainCat && a.sub_category && !subs.includes(a.sub_category)) subs.push(a.sub_category); 
+      });
+      renderTabs(sortSubCategories(subs)); 
+      renderSubCategoryGrid(sortSubCategories(subs));
     }
 
     function setSubCategory(subCat) {
