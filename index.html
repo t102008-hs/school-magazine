@@ -610,8 +610,7 @@
       }, 300);
     }
    
-    // ★ 支援在全螢幕燈箱中無縫切換「圖片」與「影片」，並以純黑遮罩徹底隱藏 Drive 右上角跳轉圖示
-    function updateLightboxImage() {
+function updateLightboxImage() {
       resetImageTransform(); 
       var img = document.getElementById('lightbox-img'); 
       var videoBox = document.getElementById('lightbox-video-box');
@@ -621,22 +620,17 @@
       // 切換項目時，先清空上一個影片確保聲音停止
       if (videoBox) videoBox.innerHTML = '';
 
-if (currentData.type === 'youtube' || currentData.type === 'drive_video') {
+      if (currentData.type === 'youtube' || currentData.type === 'drive_video') {
         img.style.display = 'none';
         videoBox.style.display = 'block';
         if (currentData.type === 'drive_video') {
-          // ★ 關鍵修復：移除會導致 iOS 破版的 sandbox，改用 absolute inset-0 強制鎖定 iframe 邊界，並保留右上角黑塊遮蔽跳轉鈕
-          videoBox.innerHTML = 
-            '<iframe src="' + currentData.embedUrl + '" class="
-absolute inset-0 w-full h-full border-0" allow="autoplay; fullscreen" allowfullscreen></iframe>' +
-            '<div class="absolute top-0 right-0 w-16 h-14 bg-black z-20 pointer-events-auto select-none" onclick="event.stopPropagation(); return false;"></div>';
+          // ★ 已修復單引號跨行問題：確保整串 HTML 字串在同一行內接好
+          videoBox.innerHTML = '<iframe src="' + currentData.embedUrl + '" class="absolute inset-0 w-full h-full border-0" allow="autoplay; fullscreen" allowfullscreen></iframe><div class="absolute top-0 right-0 w-16 h-14 bg-black z-20 pointer-events-auto select-none" onclick="event.stopPropagation(); return false;"></div>';
         } else {
-          // YouTube 影片加上 playsinline=1 讓手機版可在框內順暢播放或全螢幕
           var ytUrl = currentData.embedUrl + (currentData.embedUrl.indexOf('?') !== -1 ? '&playsinline=1' : '?playsinline=1');
-          videoBox.innerHTML = 
-            '<iframe src="' + ytUrl + '" class="absolute inset-0 w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>';
+          videoBox.innerHTML = '<iframe src="' + ytUrl + '" class="absolute inset-0 w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>';
         }
-       } else {
+      } else {
         if (videoBox) videoBox.style.display = 'none';
         img.style.display = 'block';
         img.style.transition = 'transform 0.1s ease'; 
