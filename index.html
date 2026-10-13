@@ -302,13 +302,45 @@ document.addEventListener('touchend', function(e) {
       });
     }
 
-    window.onload = function() {
-      var API_URL = 'https://script.google.com/macros/s/AKfycbwC8LeMgJ3lVws0PzgY94Opq5S_RsQqW-NGAXFwzgRUAXEcDo-W7L879dQBigHJ91ph/exec'; 
+window.onload = function() {
+      // 1. 換成你剛剛複製並加上 ?api=true 的最新 GAS 網址
+      var API_URL = 'https://script.google.com/a/macros/tmail.hc.edu.tw/s/AKfycbyirrh5kS5_rp8bgyqts7ciy_PaLOBgiK84H7WaAVtnYs1OkCT3c_Kdn57diJFt_B-2/exec?api=true'; 
       
-      fetch('./articles.json')
-        .then(function(response) { return response.json(); })
-        .then(function(data) { initApp(data); })
-        .catch(function(error) { showError(error); });
+      // 2. 顯示載入動畫 (如果有這個元素的話)
+      var loadingEl = document.getElementById('splash-loading');
+      if (loadingEl) loadingEl.style.display = 'flex';
+
+      // 3. 透過 fetch 向 GAS 請求資料
+      fetch(API_URL)
+        .then(function(response) {
+          return response.json(); // 解析 JSON 資料
+        })
+        .then(function(data) {
+          initApp(data); // 將資料交給原本寫好的初始化函數
+        })
+        .catch(function(error) {
+          showError(error);
+          console.error("資料讀取失敗:", error);
+        });window.onload = function() {
+      // 1. 換成你剛剛複製並加上 ?api=true 的最新 GAS 網址
+      var API_URL = 'https://script.google.com/a/macros/tmail.hc.edu.tw/s/AKfycbyirrh5kS5_rp8bgyqts7ciy_PaLOBgiK84H7WaAVtnYs1OkCT3c_Kdn57diJFt_B-2/exec?api=true'; 
+      
+      // 2. 顯示載入動畫 (如果有這個元素的話)
+      var loadingEl = document.getElementById('splash-loading');
+      if (loadingEl) loadingEl.style.display = 'flex';
+
+      // 3. 透過 fetch 向 GAS 請求資料
+      fetch(API_URL)
+        .then(function(response) {
+          return response.json(); // 解析 JSON 資料
+        })
+        .then(function(data) {
+          initApp(data); // 將資料交給原本寫好的初始化函數
+        })
+        .catch(function(error) {
+          showError(error);
+          console.error("資料讀取失敗:", error);
+        });
       
       var lbImg = document.getElementById('lightbox-img');
       lbImg.addEventListener('dblclick', function(e) {
