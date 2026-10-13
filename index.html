@@ -519,15 +519,26 @@
         });
       }
       
-      // 渲染 16:9 影片播放器
+// ★ 升級版：限制最大高度確保完整顯示在彈窗內，並封鎖/隱藏 Drive 右上角跳轉按鈕
       var videoContainer = document.getElementById('modal-videos');
       videoContainer.innerHTML = '';
       if (videos.length > 0) {
         videoContainer.style.display = 'block';
         videos.forEach(function(v) {
           var vWrapper = document.createElement('div');
-          vWrapper.className = 'w-full aspect-video rounded-2xl overflow-hidden shadow-md bg-black border border-gray-100';
-          vWrapper.innerHTML = '<iframe src="' + v.embedUrl + '" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+          // 透過 max-h-[52vh] 與 mx-auto 讓影片自動依高度等比例縮放並置中，絕不超出彈窗
+          vWrapper.className = 'relative w-full max-w-2xl max-h-[52vh] aspect-video mx-auto rounded-2xl overflow-hidden shadow-md bg-black border border-gray-100';
+          
+          // 若是 Google Drive 影片，加入 sandbox 徹底禁止跳轉新視窗，並在右上角加上遮罩擋住該圖示
+          if (v.type === 'drive_video') {
+            vWrapper.innerHTML = 
+              '<iframe src="' + v.embedUrl + '" class="w-full h-full" frameborder="0" sandbox="allow-scripts allow-same-origin" allowfullscreen></iframe>' +
+              '<div class="absolute top-0 right-0 w-14 h-14 z-10 cursor-default" title=""></div>';
+          } else {
+            // YouTube 影片維持正常嵌入
+            vWrapper.innerHTML = '<iframe src="' + v.embedUrl + '" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+          }
+          
           videoContainer.appendChild(vWrapper);
         });
       } else {
