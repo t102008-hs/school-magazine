@@ -104,25 +104,6 @@
     </div>
   </div>
   
-<!-- ================= 4. 閱讀文章彈窗 ================= -->
-  <div id="article-modal" class="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 transition-transform duration-300 translate-x-full md:translate-x-0 md:opacity-0" style="display:none;">
-    <div id="modal-inner" class="w-full md:w-[85vw] lg:max-w-6xl bg-white rounded-[2rem] shadow-2xl overflow-y-auto max-h-[90vh] md:max-h-[85vh] relative flex flex-col hide-scroll-x">
-      
-      <!-- 關閉按鈕列 (移除漸層，讓按鈕常駐右上角不佔空間) -->
-      <div class="sticky top-0 w-full z-20 flex justify-end p-4 md:p-6 pointer-events-none">
-        <button id="btn-close-modal" class="pointer-events-auto text-gray-500 bg-gray-100 hover:bg-gray-200 p-2.5 rounded-full transition active:scale-原來如此！這兩個問題都是因為我們上一版「隱藏大封面圖」時，保留了原本預留給大圖片的版面空間與漸層。
-
-1. **灰色漸層**：那是原本為了讓「封面圖」上的白色關閉按鈕更清楚，而在按鈕底部加的半透明漸層。
-2. **上方浪費的空白**：因為雖然大圖片被隱藏了，但它原本佔用的 Margin (外距) 和 Padding (內距) 沒有拿掉，導致文字被往下擠。
-
-這次我們把它清得乾乾淨淨，讓彈窗一打開，文字就會在最剛好的高度呈現！
-
-請在 GitHub 上的 `index.html` 進行以下**兩個地方**的替換：
-
-### 第一步：修改彈窗的 HTML 結構 (移除漸層與空白)
-請在程式碼中找到 `<!-- ================= 4. 閱讀文章彈窗 ================= -->`，將這個區塊**整段替換為以下程式碼**：
-
-```html
   <!-- ================= 4. 閱讀文章彈窗 ================= -->
   <div id="article-modal" class="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 transition-transform duration-300 translate-x-full md:translate-x-0 md:opacity-0" style="display:none;">
     <div id="modal-inner" class="w-full md:w-[85vw] lg:max-w-6xl bg-white rounded-[2rem] shadow-2xl overflow-y-auto max-h-[90vh] md:max-h-[85vh] relative flex flex-col hide-scroll-x">
