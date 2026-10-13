@@ -6,7 +6,17 @@
   <title>香山國小數位校刊</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = { theme: { extend: { colors: { milktea: '#F4ECE4', cardBg: 'rgba(255, 255, 255, 0.75)', morandi: { taupe: '#B4968F', pink: '#F58595', dark: '#7A635E', light: '#E8DEDC' } } } } }
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            milktea: '#F4ECE4',
+            cardBg: 'rgba(255, 255, 255, 0.75)',
+            morandi: { taupe: '#B4968F', pink: '#F58595', dark: '#7A635E', light: '#E8DEDC' }
+          }
+        }
+      }
+    }
   </script>
   <style>
     .article-content { white-space: pre-wrap; }
@@ -19,6 +29,7 @@
 </head>
 <body class="bg-milktea min-h-[100dvh] text-gray-800 font-sans relative md:flex overflow-x-hidden transition-colors duration-500">
   
+  <!-- ================= 1. 歡迎頁 ================= -->
   <div id="splash-screen" class="fixed inset-0 z-[100] bg-milktea flex flex-col items-center justify-center transition-opacity duration-500">
     <h1 class="text-4xl md:text-5xl font-extrabold text-morandi-dark mb-2 tracking-wider drop-shadow-sm">香山國小校刊</h1>
     <p class="text-morandi-dark/80 mb-12 text-lg font-medium tracking-widest bg-morandi-light/50 px-5 py-1.5 rounded-full">探索校園美好點滴</p>
@@ -29,59 +40,92 @@
     <button id="btn-start-reading" class="bg-morandi-dark text-white px-10 py-4 rounded-full shadow-lg font-bold text-lg tracking-wider hover:opacity-90 hover:scale-105 transition active:scale-95" style="display:none;">開始閱讀</button>
   </div>
   
-  <nav id="bottom-nav" class="fixed z-50 transition-transform duration-300 ease-in-out bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-[420px] bg-white/85 backdrop-blur-xl border border-white/60 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-2 py-2 flex justify-between items-center md:bottom-auto md:left-0 md:translate-x-0 md:w-64 md:h-screen md:rounded-none md:border-t-0 md:border-r md:border-white/40 md:bg-transparent md:shadow-none md:px-6 md:pt-12 md:flex-col md:justify-start md:items-stretch">
+  <!-- ================= 2. 導覽列 ================= -->
+  <nav id="bottom-nav" class="fixed z-50 transition-transform duration-300 ease-in-out
+              bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-[420px] bg-white/85 backdrop-blur-xl border border-white/60 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] px-2 py-2 flex justify-between items-center
+              md:bottom-auto md:left-0 md:translate-x-0 md:w-64 md:h-screen md:rounded-none md:border-t-0 md:border-r md:border-white/40 md:bg-transparent md:shadow-none md:px-6 md:pt-12 md:flex-col md:justify-start md:items-stretch">
+    
     <div class="hidden md:block mb-10 text-center md:text-left">
       <h1 class="text-2xl font-extrabold text-morandi-dark tracking-wider">香山國小</h1>
       <h2 class="text-sm font-bold text-morandi-dark/80 tracking-widest mt-1">數位校刊</h2>
     </div>
+
     <div class="flex justify-between md:flex-col md:justify-start items-center md:items-stretch w-full md:space-y-3">
-      <button id="nav-admin" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-morandi-dark md:bg-white/60 md:p-3 md:rounded-2xl group"><svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 10l7.1-6.3a1.3 1.3 0 0 1 1.8 0L20 10"></path><path d="M6 10v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-9"></path><path d="M10 21v-5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v5"></path></svg><span class="text-[10px] md:text-base font-bold tracking-wider">行政</span></button>
-      <button id="nav-lower" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group"><svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22v-8"></path><path d="M12 14c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path><path d="M12 14c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path></svg><span class="text-[10px] md:text-base font-bold tracking-wider">低年級</span></button>
-      <button id="nav-middle" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group"><svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22V6"></path><path d="M12 16c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path><path d="M12 11c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path><path d="M12 6c2.5 0 4-2 0-6-4 4-2.5 6 0 6z"></path></svg><span class="text-[10px] md:text-base font-bold tracking-wider">中年級</span></button>
-      <button id="nav-upper" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group"><svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22v-6"></path><path d="M18 16a5 5 0 0 0-1.5-9.5 6 6 0 0 0-10 1 4.5 4.5 0 0 0 1.5 8.5 Z"></path></svg><span class="text-[10px] md:text-base font-bold tracking-wider">高年級</span></button>
-      <button id="nav-kinder" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group"><svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3s-6 5-6 10c0 4 3 7 6 7s6-3 6-7c0-5-6-10-6-10z"></path><path d="M9 12a4 4 0 0 0 0 5"></path></svg><span class="text-[10px] md:text-base font-bold tracking-wider leading-tight">星光<br class="md:hidden">幼兒</span></button>
+      <button id="nav-admin" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-morandi-dark md:bg-white/60 md:p-3 md:rounded-2xl group">
+        <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 10l7.1-6.3a1.3 1.3 0 0 1 1.8 0L20 10"></path><path d="M6 10v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-9"></path><path d="M10 21v-5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v5"></path></svg>
+        <span class="text-[10px] md:text-base font-bold tracking-wider">行政</span>
+      </button>
+      <button id="nav-lower" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group">
+        <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22v-8"></path><path d="M12 14c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path><path d="M12 14c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path></svg>
+        <span class="text-[10px] md:text-base font-bold tracking-wider">低年級</span>
+      </button>
+      <button id="nav-middle" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group">
+        <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22V6"></path><path d="M12 16c3.5 0 6.5-2.5 6.5-6.5-3 0-6.5 2.5-6.5 6.5z"></path><path d="M12 11c-3.5 0-6.5-2.5-6.5-6.5 3 0 6.5 2.5 6.5 6.5z"></path><path d="M12 6c2.5 0 4-2 0-6-4 4-2.5 6 0 6z"></path></svg>
+        <span class="text-[10px] md:text-base font-bold tracking-wider">中年級</span>
+      </button>
+      <button id="nav-upper" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group">
+        <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22v-6"></path><path d="M18 16a5 5 0 0 0-1.5-9.5 6 6 0 0 0-10 1 4.5 4.5 0 0 0 1.5 8.5 Z"></path></svg>
+        <span class="text-[10px] md:text-base font-bold tracking-wider">高年級</span>
+      </button>
+      <button id="nav-kinder" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group">
+        <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3s-6 5-6 10c0 4 3 7 6 7s6-3 6-7c0-5-6-10-6-10z"></path><path d="M9 12a4 4 0 0 0 0 5"></path></svg>
+        <span class="text-[10px] md:text-base font-bold tracking-wider leading-tight">星光<br class="md:hidden">幼兒</span>
+      </button>
     </div>
-    <div class="hidden md:flex mt-auto w-full pb-6 pt-4"><a href="https://script.google.com/a/macros/tmail.hc.edu.tw/s/AKfycbyirrh5kS5_rp8bgyqts7ciy_PaLOBgiK84H7WaAVtnYs1OkCT3c_Kdn57diJFt_B-2/exec" target="_blank" class="w-full flex items-center justify-center gap-2 bg-white/40 hover:bg-white/70 text-gray-500 hover:text-morandi-dark font-bold py-3 rounded-2xl transition-colors shadow-sm border border-white/50"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg><span class="tracking-wider">後台管理</span></a></div>
+
+    <div class="hidden md:flex mt-auto w-full pb-6 pt-4">
+      <a href="https://script.google.com/a/macros/tmail.hc.edu.tw/s/AKfycbyirrh5kS5_rp8bgyqts7ciy_PaLOBgiK84H7WaAVtnYs1OkCT3c_Kdn57diJFt_B-2/exec" target="_blank" class="w-full flex items-center justify-center gap-2 bg-white/40 hover:bg-white/70 text-gray-500 hover:text-morandi-dark font-bold py-3 rounded-2xl transition-colors shadow-sm border border-white/50">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+        <span class="tracking-wider">後台管理</span>
+      </a>
+    </div>
   </nav>
   
+  <!-- ================= 3. 主內容區塊 ================= -->
   <div class="flex-1 flex flex-col min-h-screen md:ml-64 md:p-6 pb-28 md:pb-6">
     <div class="md:bg-white/60 md:backdrop-blur-2xl md:rounded-[2.5rem] md:shadow-xl md:border md:border-white/50 flex-1 flex flex-col overflow-hidden relative">
       <header id="top-header" class="sticky top-0 z-30 transition-transform duration-300 bg-milktea/90 md:bg-white/60 backdrop-blur-md pt-safe">
         <div class="w-full max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between py-4">
           <div class="flex space-x-3 hide-scroll-x flex-1 items-center" id="category-tabs"></div>
-          <a href="https://script.google.com/a/macros/tmail.hc.edu.tw/s/AKfycbyirrh5kS5_rp8bgyqts7ciy_PaLOBgiK84H7WaAVtnYs1OkCT3c_Kdn57diJFt_B-2/exec" target="_blank" class="md:hidden ml-3 p-2.5 bg-white text-gray-500 rounded-full border border-gray-100 hover:text-morandi-dark shadow-sm active:scale-95 shrink-0"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg></a>
+          
+          <a href="https://script.google.com/a/macros/tmail.hc.edu.tw/s/AKfycbyirrh5kS5_rp8bgyqts7ciy_PaLOBgiK84H7WaAVtnYs1OkCT3c_Kdn57diJFt_B-2/exec" target="_blank" class="md:hidden ml-3 p-2.5 bg-white text-gray-500 rounded-full border border-gray-100 hover:text-morandi-dark shadow-sm active:scale-95 shrink-0">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+          </a>
         </div>
       </header>
+      
       <div id="subcat-grid" class="p-4 md:p-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 max-w-7xl mx-auto w-full pb-8" style="display:none;"></div>
-      <main id="article-list" class="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full pb-8" style="display:none;"></main>
+      <main id="article-list" class="p-4 md:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto w-full pb-8" style="display:none;"></main>
     </div>
   </div>
   
+  <!-- ================= 4. 閱讀文章彈窗 ================= -->
   <div id="article-modal" class="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 transition-transform duration-300 translate-x-full md:translate-x-0 md:opacity-0" style="display:none;">
     <div id="modal-inner" class="w-full md:w-[85vw] lg:max-w-6xl bg-white rounded-[2rem] shadow-2xl overflow-y-auto max-h-[90vh] md:max-h-[85vh] relative flex flex-col hide-scroll-x">
-      <button id="btn-close-modal" class="absolute top-4 right-4 md:top-6 md:right-6 z-20 pointer-events-auto text-gray-500 bg-gray-100 hover:bg-gray-200 w-10 h-10 flex items-center justify-center rounded-full transition active:scale-90"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+      
+      <button id="btn-close-modal" class="absolute top-4 right-4 md:top-6 md:right-6 z-20 pointer-events-auto text-gray-500 bg-gray-100 hover:bg-gray-200 w-10 h-10 flex items-center justify-center rounded-full transition active:scale-90">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+      </button>
+      
       <div class="px-6 pt-16 pb-8 md:px-12 md:pt-16 md:pb-12 lg:px-16 lg:pb-16 flex-1 bg-white">
         <div class="max-w-4xl mx-auto">
           <div class="mb-6 border-b border-gray-100 pb-4">
             <span class="text-xs md:text-sm font-semibold text-morandi-dark bg-morandi-light px-3 py-1.5 rounded-full mb-3 inline-block" id="modal-category"></span>
             <h2 class="text-2xl md:text-4xl font-bold text-gray-900 mt-1 mb-4 leading-snug" id="modal-title"></h2>
-            <div class="flex justify-between text-sm md:text-base text-gray-500"><span id="modal-author"></span><span id="modal-date"></span></div>
+            <div class="flex justify-between text-sm md:text-base text-gray-500">
+              <span id="modal-author"></span><span id="modal-date"></span>
+            </div>
           </div>
-          
-          <!-- ★ 全新設計：內文主視覺 (Hero Image) -->
-          <div id="modal-hero-image" class="w-full rounded-[1.5rem] overflow-hidden mb-8 shadow-sm cursor-zoom-in hover:opacity-95 transition" style="display:none;">
-              <img id="modal-hero-img-src" src="" class="w-full h-auto max-h-[60vh] object-cover bg-gray-50">
-          </div>
-          
           <div class="article-content text-gray-700 text-base md:text-lg leading-relaxed md:leading-loose mb-10" id="modal-content"></div>
           
-          <!-- 剩餘照片的畫廊區 -->
+          <!-- 所有照片都在這個畫廊區塊中 -->
           <div id="modal-gallery" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-8"></div>
         </div>
       </div>
     </div>
   </div>
   
+  <!-- ================= 5. Lightbox 圖片放大 ================= -->
   <div id="lightbox" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-xl flex flex-col items-center justify-center opacity-0 transition-opacity duration-300 touch-none" style="display:none;">
     <button id="btn-close-lightbox" class="absolute top-6 right-6 text-white p-3 z-20 bg-black/30 rounded-full hover:bg-white/20 transition active:scale-90"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
     <div id="lightbox-counter" class="absolute top-8 left-6 text-white/70 font-bold z-20 text-sm tracking-widest drop-shadow-md"></div>
@@ -161,7 +205,7 @@
     }
 
     window.onload = function() {
-      // ⚠️ 記得換成你的 API 網址！
+      // ⚠️ 記得換成你的完全公開版 API 網址！
       var API_URL = 'https://script.google.com/macros/s/AKfycbx0WYcfguRrU0oj-BMRjnwrz6LySteDiy7ZMuF4WnaoKFJoqtL3nF3Bpe0M7bm2PG9Z/exec?api=true'; 
       var loadingEl = document.getElementById('splash-loading'); if (loadingEl) loadingEl.style.display = 'flex';
       fetch(API_URL).then(function(res) { return res.json(); }).then(function(data) { initApp(data); }).catch(function(err) { showError(err); });
@@ -245,7 +289,7 @@
       renderArticles(filtered);
     }
 
-    // ★ 全新卡片排版：雜誌風大圖 (Top Image)
+    // ★ 重構：高資訊密度的精巧版卡片排版
     function renderArticles(articles) {
       var gridContainer = document.getElementById('subcat-grid'); var listContainer = document.getElementById('article-list');
       gridContainer.style.display = 'none'; listContainer.style.display = 'grid'; listContainer.innerHTML = '';
@@ -253,7 +297,7 @@
       
       articles.forEach(function(article) {
         var card = document.createElement('div');
-        card.className = 'article-card bg-white/80 backdrop-blur-sm rounded-[2rem] p-5 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-white cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95 flex flex-col h-full';
+        card.className = 'article-card bg-white/80 backdrop-blur-sm rounded-[1.5rem] p-4 md:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-white cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95 flex flex-col h-full justify-between';
         card.id = 'article-' + article.id;
         
         var allImages = [];
@@ -262,37 +306,43 @@
           var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
           items.forEach(function(item) { var url = formatDriveUrl(item.split('|||')[0]); if (url) allImages.push(url); });
         }
-        allImages = allImages.filter(function(item, pos) { return allImages.indexOf(item) == pos; }); // 去重複
+        allImages = allImages.filter(function(item, pos) { return allImages.indexOf(item) == pos; });
         
-        var contentHtml = '';
+        // 內容水平排版：左邊文字，右邊相疊圖片
+        var contentHtml = '<div class="flex justify-between items-start gap-4 flex-1">';
         
-        // 1. 頂部大圖區
+        // 左側文字區塊
+        contentHtml += '<div class="flex-1 flex flex-col">';
+        contentHtml += '<div class="mb-2"><span class="text-[10px] md:text-xs font-bold text-morandi-dark bg-morandi-light/80 px-2.5 py-1 rounded-full">' + (article.sub_category || article.main_category || '未分類') + '</span></div>';
+        if (article.title) {
+            contentHtml += '<h2 class="text-base md:text-lg font-bold text-gray-800 line-clamp-3 leading-snug">' + article.title + '</h2>';
+        }
+        contentHtml += '</div>';
+        
+        // 右側乾淨相疊的縮圖
         if (allImages.length > 0) {
-            contentHtml += '<div class="w-full aspect-video rounded-2xl overflow-hidden mb-5 relative shrink-0 bg-gray-100">';
-            contentHtml += '<img src="' + allImages[0] + '" class="w-full h-full object-cover">';
-            if (allImages.length > 1) {
-                contentHtml += '<div class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> +' + (allImages.length - 1) + '</div>';
+            contentHtml += '<div class="relative w-20 h-20 md:w-24 md:h-24 shrink-0">';
+            var displayCount = Math.min(allImages.length, 3);
+            for (var i = displayCount - 1; i >= 0; i--) {
+                contentHtml += '<div class="absolute rounded-xl shadow-sm border-[2px] border-white overflow-hidden bg-gray-100" style="width:calc(100% - 6px); height:calc(100% - 6px); top:' + (i * 3) + 'px; right:' + ((displayCount - 1 - i) * 3) + 'px; z-index:' + (30 - i * 10) + '">';
+                contentHtml += '<img src="' + allImages[i] + '" class="w-full h-full object-cover">';
+                contentHtml += '</div>';
             }
             contentHtml += '</div>';
         }
+        contentHtml += '</div>';
         
-        // 2. 文字資訊區
-        contentHtml += '<div class="flex flex-col flex-1">';
-        contentHtml += '<div class="mb-3 flex items-center"><span class="text-xs font-bold text-morandi-dark bg-morandi-light/80 px-3 py-1.5 rounded-full">' + (article.sub_category || article.main_category || '未分類') + '</span></div>';
-        if (article.title) contentHtml += '<h2 class="text-xl md:text-2xl font-bold text-gray-800 line-clamp-2 leading-snug mb-3">' + article.title + '</h2>';
-        
-        // 3. 底部作者與按鈕
-        contentHtml += '<div class="mt-auto pt-3 flex items-center justify-between text-sm">';
-        contentHtml += article.author ? '<span class="font-bold text-gray-400">作者 / ' + article.author + '</span>' : '<span></span>';
-        contentHtml += '<span class="text-morandi-dark font-bold bg-morandi-light/40 px-3 py-1.5 rounded-xl transition-colors group-hover:bg-morandi-light">閱讀全文 &rarr;</span>';
-        contentHtml += '</div></div>';
+        // 底部作者
+        if (article.author) {
+            contentHtml += '<div class="mt-3 pt-3 border-t border-gray-100/80 text-right shrink-0"><span class="text-xs md:text-sm font-bold text-gray-400">作者 / ' + article.author + '</span></div>';
+        }
         
         card.innerHTML = contentHtml;
         listContainer.appendChild(card);
       });
     }
 
-    // ★ 全新彈窗排版：首圖 (Hero Image) 整合畫廊
+    // ★ 重構彈窗：取消巨大首圖，所有圖片直接排在底部畫廊
     function openModal(articleId) {
       var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); if(!article) return;
       document.getElementById('modal-category').innerText = article.sub_category || article.main_category || '未分類';
@@ -302,40 +352,28 @@
       document.getElementById('modal-date').innerText = article.publish_date || '';
       document.getElementById('modal-content').innerText = article.content || '';
       
-      // 收集所有照片
       var allImages = [];
-      if (article.cover_image) allImages.push({ safeUrl: formatDriveUrl(article.cover_image), rawUrl: formatDriveUrl(article.cover_image), caption: '' });
+      if (article.cover_image) allImages.push({ safeUrl: formatDriveUrl(article.cover_image), caption: '' });
       if (article.gallery) {
         var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
         items.forEach(function(item) {
           var parts = item.split('|||'); var safeUrl = formatDriveUrl(parts[0]);
-          if (safeUrl) allImages.push({ safeUrl: safeUrl, rawUrl: parts[0], caption: parts.length > 1 ? parts[1] : '' });
+          if (safeUrl) allImages.push({ safeUrl: safeUrl, caption: parts.length > 1 ? parts[1] : '' });
         });
       }
       
       currentGalleryData = allImages.map(img => ({ url: img.safeUrl, caption: img.caption }));
-      var heroContainer = document.getElementById('modal-hero-image');
-      var heroImgSrc = document.getElementById('modal-hero-img-src');
       var galleryContainer = document.getElementById('modal-gallery');
       galleryContainer.innerHTML = '';
       
-      if (allImages.length > 0) {
-        // 第一張圖當作內文主視覺
-        heroImgSrc.src = allImages[0].safeUrl;
-        heroContainer.style.display = 'block';
-        heroContainer.onclick = function() { openLightbox(0); }; // 點擊主視覺一樣可以放大
-        
-        // 第二張以後的圖放進底下的畫廊
-        for (var i = 1; i < allImages.length; i++) {
-            var gDiv = document.createElement('div');
-            gDiv.className = 'gallery-thumb w-full aspect-square bg-gray-100 overflow-hidden cursor-pointer rounded-xl hover:ring-2 hover:ring-morandi-taupe transition-all';
-            gDiv.id = 'thumb-' + i;
-            var gImg = document.createElement('img');
-            gImg.src = allImages[i].safeUrl; gImg.className = 'w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity';
-            gDiv.appendChild(gImg); galleryContainer.appendChild(gDiv);
-        }
-      } else {
-        heroContainer.style.display = 'none';
+      // 所有圖片直接進入畫廊方格
+      for (var i = 0; i < allImages.length; i++) {
+          var gDiv = document.createElement('div');
+          gDiv.className = 'gallery-thumb w-full aspect-square bg-gray-100 overflow-hidden cursor-pointer rounded-xl hover:ring-2 hover:ring-morandi-taupe transition-all';
+          gDiv.id = 'thumb-' + i;
+          var gImg = document.createElement('img');
+          gImg.src = allImages[i].safeUrl; gImg.className = 'w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity';
+          gDiv.appendChild(gImg); galleryContainer.appendChild(gDiv);
       }
       
       var modal = document.getElementById('article-modal'); modal.style.display = 'flex'; document.body.classList.add('modal-open');
