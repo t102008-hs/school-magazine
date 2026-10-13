@@ -104,19 +104,17 @@
     </div>
   </div>
   
-  <!-- ================= 4. 閱讀文章彈窗 ================= -->
+<!-- ================= 4. 閱讀文章彈窗 ================= -->
   <div id="article-modal" class="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 md:p-8 transition-transform duration-300 translate-x-full md:translate-x-0 md:opacity-0" style="display:none;">
     <div id="modal-inner" class="w-full md:w-[85vw] lg:max-w-6xl bg-white rounded-[2rem] shadow-2xl overflow-y-auto max-h-[90vh] md:max-h-[85vh] relative flex flex-col hide-scroll-x">
       
-      <!-- 關閉按鈕：取消灰色漸層，並設定 h-0 避免佔用排版高度 -->
-      <div class="sticky top-0 w-full z-20 flex justify-end p-4 md:p-6 pointer-events-none h-0">
-        <button id="btn-close-modal" class="pointer-events-auto text-gray-600 bg-white/90 backdrop-blur-md hover:bg-gray-100 p-2.5 rounded-full shadow-sm border border-gray-200 transition active:scale-90">
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
-        </button>
-      </div>
+      <!-- 關閉按鈕：改為絕對定位，並固定寬高 (w-10 h-10) 確保永遠是完美的正圓形 -->
+      <button id="btn-close-modal" class="absolute top-4 right-4 md:top-6 md:right-6 z-20 pointer-events-auto text-gray-500 bg-gray-100 hover:bg-gray-200 w-10 h-10 flex items-center justify-center rounded-full transition active:scale-90">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+      </button>
       
-      <!-- 內容區：減少上方 padding，徹底移除浪費的空間 -->
-      <div class="px-6 pt-16 pb-8 md:px-12 md:pt-20 md:pb-12 lg:px-16 lg:pb-16 flex-1 bg-white">
+      <!-- 內容區：微調上方 padding，使其與按鈕保持舒適但不空曠的距離 -->
+      <div class="px-6 pt-16 pb-8 md:px-12 md:pt-16 md:pb-12 lg:px-16 lg:pb-16 flex-1 bg-white">
         <div class="max-w-4xl mx-auto">
           <div class="mb-6 border-b border-gray-100 pb-4">
             <span class="text-xs md:text-sm font-semibold text-morandi-dark bg-morandi-light px-3 py-1.5 rounded-full mb-3 inline-block" id="modal-category"></span>
