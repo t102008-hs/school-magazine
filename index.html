@@ -302,29 +302,9 @@ document.addEventListener('touchend', function(e) {
       });
     }
 
-     window.onload = function() {
-      // 1. 換成你剛剛複製並加上 ?api=true 的最新 GAS 網址
-      var API_URL = 'https://script.google.com/macros/s/AKfycbx0WYcfguRrU0oj-BMRjnwrz6LySteDiy7ZMuF4WnaoKFJoqtL3nF3Bpe0M7bm2PG9Z/exec?api=true'; 
-      
-      // 2. 顯示載入動畫 (如果有這個元素的話)
-      var loadingEl = document.getElementById('splash-loading');
-      if (loadingEl) loadingEl.style.display = 'flex';
-
-      // 3. 透過 fetch 向 GAS 請求資料
-      fetch(API_URL)
-        .then(function(response) {
-          return response.json(); // 解析 JSON 資料
-        })
-        .then(function(data) {
-          initApp(data); // 將資料交給原本寫好的初始化函數
-        })
-        .catch(function(error) {
-          showError(error);
-          console.error("資料讀取失敗:", error);
-        });
 window.onload = function() {
       // ⚠️ 請記得把下方的網址換成你 GAS 最新部署出來的網址
-      var API_URL = 'https://script.google.com/macros/s/AKfycbx0WYcfguRrU0oj-BMRjnwrz6LySteDiy7ZMuF4WnaoKFJoqtL3nF3Bpe0M7bm2PG9Z/exec'; 
+      var API_URL = 'https://script.google.com/macros/s/AKfycbx0WYcfguRrU0oj-BMRjnwrz6LySteDiy7ZMuF4WnaoKFJoqtL3nF3Bpe0M7bm2PG9Z/exec?api=true'; 
       
       var loadingEl = document.getElementById('splash-loading');
       if (loadingEl) loadingEl.style.display = 'flex';
@@ -747,8 +727,7 @@ function updateLightboxImage() {
    
     function prevImage() { if (currentLightboxIndex > 0) { currentLightboxIndex--; updateLightboxImage(); } }
     function nextImage() { if (currentLightboxIndex < currentGalleryData.length - 1) { currentLightboxIndex++; updateLightboxImage(); } }
-    function showError(error) { 
-      document.getElementById('splash-loading').innerHTML = '<p class="text-red-500 font-bold text-center">載入失敗<br>請重新整理</p>';  }
+    function showError(error) { document.getElementById('splash-loading').innerHTML = '<p class="text-red-500 font-bold text-center">載入失敗<br>請重新整理</p>'; }
   </script>
 </body>
 </html>
