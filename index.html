@@ -121,17 +121,17 @@
     </div>
   </div>
   
-  <!-- ================= 5. Lightbox 圖片與影片全螢幕放大 ================= -->
-  <div id="lightbox" class="fixed inset-0 z-[70] bg-black/95 backdrop-blur-xl flex flex-col items-center justify-center opacity-0 transition-opacity duration-300" style="display:none;">
-    <button id="btn-close-lightbox" class="absolute top-6 right-6 text-white p-3 z-30 bg-white/10 rounded-full hover:bg-white/20 transition active:scale-90"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-    <div id="lightbox-counter" class="absolute top-8 left-6 text-white/70 font-bold z-30 text-sm tracking-widest drop-shadow-md"></div>
+<!-- ================= 5. Lightbox 圖片與影片全螢幕放大 ================= -->
+  <div id="lightbox" class="fixed inset-0 z-[70] bg-black flex flex-col items-center justify-center opacity-0 transition-opacity duration-300" style="display:none;">
+    <button id="btn-close-lightbox" class="absolute top-5 right-5 text-white p-3 z-30 bg-white/15 rounded-full hover:bg-white/25 transition active:scale-90 shadow-lg"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <div id="lightbox-counter" class="absolute top-7 left-6 text-white/80 font-bold z-30 text-sm tracking-widest drop-shadow-md"></div>
     <button id="btn-prev-img" class="absolute left-4 text-white p-4 z-30 opacity-50 hover:opacity-100 hidden md:block bg-white/10 rounded-full transition"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
     <button id="btn-next-img" class="absolute right-4 text-white p-4 z-30 opacity-50 hover:opacity-100 hidden md:block bg-white/10 rounded-full transition"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
     
-    <!-- 主顯示區 -->
-    <div class="w-full h-full flex items-center justify-center overflow-hidden pb-32 px-3 md:px-8 pt-20">
+    <!-- 主顯示區：照片模式保留上下邊距，影片模式將動態切換為 100% 滿版全螢幕 -->
+    <div id="lightbox-main-area" class="w-full h-full flex items-center justify-center overflow-hidden pb-32 px-3 md:px-8 pt-20">
       <img id="lightbox-img" src="" draggable="false" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl select-none pointer-events-auto touch-none" style="transform: scale(0.95); transition: transform 0.3s ease;">
-      <div id="lightbox-video-box" class="w-full max-w-3xl pointer-events-auto" style="display:none;"></div>
+      <div id="lightbox-video-box" class="relative w-full h-full flex items-center justify-center pointer-events-auto" style="display:none;"></div>
     </div>
     
     <div id="lightbox-caption" class="absolute bottom-[100px] w-full flex justify-center px-4 z-30 pointer-events-none"><span class="inline-block bg-black/40 backdrop-blur-md text-white/95 text-sm md:text-base font-medium tracking-widest px-5 py-2 rounded-full shadow-sm border border-white/20 transition-opacity duration-300" id="lightbox-caption-text"></span></div>
@@ -243,17 +243,17 @@
       var caption = parts.length > 1 ? parts[1].trim() : '';
       if (!url) return null;
 
-      var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/);
+var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/);
       if (ytMatch && ytMatch[1]) {
         var ytId = ytMatch[1];
         return {
           type: 'youtube',
-          embedUrl: 'https://www.youtube.com/embed/' + ytId + '?rel=0&playsinline=1',
+          embedUrl: 'https://www.youtube.com/embed/' + ytId + '?rel=0&autoplay=1&playsinline=0&fs=1',
           thumbUrl: 'https://img.youtube.com/vi/' + ytId + '/hqdefault.jpg',
           caption: caption
         };
       }
-
+      
       var isVideo = url.indexOf('#video') !== -1 || /\.(mp4|mov|webm)$/i.test(url);
       var cleanUrl = url.replace('#video', '');
       var driveMatch = cleanUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || cleanUrl.match(/id=([a-zA-Z0-9_-]+)/);
@@ -552,7 +552,7 @@
       }, 300);
     }
    
-    function openLightbox(index) {
+function openLightbox(index) {
       if(currentGalleryData.length === 0) return;
       currentLightboxIndex = index;
       var tbContainer = document.getElementById('lightbox-thumbnails'); 
@@ -574,13 +574,28 @@
         tbContainer.appendChild(thumbWrapper);
       });
       
-      updateLightboxImage();
       var lb = document.getElementById('lightbox'); 
       lb.style.display = 'flex'; 
+      updateLightboxImage();
       setTimeout(function() { lb.classList.remove('opacity-0'); }, 10);
+
+      // ★ 若點擊的是影片小方格，直接向瀏覽器請求進入系統級全螢幕 (支援電腦與 Android)
+      var clickedItem = currentGalleryData[index];
+      if (clickedItem && (clickedItem.type === 'youtube' || clickedItem.type === 'drive_video')) {
+        try {
+          if (lb.requestFullscreen) lb.requestFullscreen();
+          else if (lb.webkitRequestFullscreen) lb.webkitRequestFullscreen();
+        } catch (e) {}
+      }
     }
 
     function closeLightbox() {
+      // ★ 若目前處於系統全螢幕狀態，關閉燈箱時自動退出全螢幕
+      try {
+        if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+      } catch (e) {}
+
       var lb = document.getElementById('lightbox'); 
       var lbImg = document.getElementById('lightbox-img');
       var videoBox = document.getElementById('lightbox-video-box');
@@ -611,45 +626,52 @@
       ].join('');
     };
 
-    function updateLightboxImage() {
+function updateLightboxImage() {
       resetImageTransform(); 
+      var mainArea = document.getElementById('lightbox-main-area');
       var img = document.getElementById('lightbox-img'); 
       var videoBox = document.getElementById('lightbox-video-box');
       var captionEl = document.getElementById('lightbox-caption-text');
+      var tbContainer = document.getElementById('lightbox-thumbnails');
       var currentData = currentGalleryData[currentLightboxIndex];
       
       if (videoBox) videoBox.innerHTML = '';
 
       if (currentData.type === 'youtube' || currentData.type === 'drive_video') {
+        // ★ 影片滿版全螢幕模式：移除所有內距、隱藏下方縮圖列，讓影片 100% 佔滿整個視窗
+        if (mainArea) mainArea.className = 'w-full h-full flex items-center justify-center overflow-hidden p-0';
+        if (tbContainer) tbContainer.style.display = 'none';
         img.style.display = 'none';
-        videoBox.style.display = 'block';
-        var wrapCls = 'relative w-full overflow-hidden rounded-2xl bg-black shadow-2xl border border-white/10';
+        videoBox.style.display = 'flex';
         
         if (currentData.type === 'drive_video') {
-          // ★ 預設先顯示乾淨完整的影片縮圖與播放鈕，點擊後才載入防破版播放器
-          var coverCls = 'absolute inset-0 w-full h-full object-contain bg-black';
-          var btnWrapCls = 'absolute inset-0 bg-black/30 flex flex-col items-center justify-center cursor-pointer group';
-          var btnCircleCls = 'w-16 h-16 rounded-full bg-morandi-dark/90 text-white flex items-center justify-center shadow-2xl ring-4 ring-white/30 transition-transform group-active:scale-95';
+          // 手機版針對滿版視窗採用 200% 畫布 + scale(0.5) 消除巨型時間軸，同時 100% 撐滿螢幕
+          var isMobile = window.innerWidth < 768;
+          var dStyle = isMobile 
+            ? 'width:200%; height:200%; transform:scale(0.5); transform-origin:0 0; border:0; position:absolute; top:0; left:0;' 
+            : 'width:100%; height:100%; border:0; position:absolute; top:0; left:0;';
+          var maskCls = 'absolute top-0 right-0 w-16 h-16 bg-black z-20 pointer-events-auto select-none';
           
           videoBox.innerHTML = [
-            '<div id="drive-player-inner" class="' + wrapCls + '" style="padding-top: 56.25%;">',
-            '<img src="' + currentData.thumbUrl + '" class="' + coverCls + '" onerror="this.style.display=\'none\'">',
-            '<div class="' + btnWrapCls + '" onclick="window.startDriveVideo(\'' + currentData.fileId + '\')">',
-            '<div class="' + btnCircleCls + '"><svg class="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>',
-            '<span class="mt-3 text-xs font-bold text-white/90 bg-black/50 px-3 py-1 rounded-full tracking-wider">點擊播放影片</span>',
-            '</div>',
+            '<div class="relative w-full h-full bg-black overflow-hidden">',
+            '<iframe src="' + currentData.embedUrl + '" style="' + dStyle + '" allow="autoplay; fullscreen" allowfullscreen></iframe>',
+            '<div class="' + maskCls + '" onclick="event.stopPropagation(); return false;"></div>',
             '</div>'
           ].join('');
         } else {
-          var yCls = 'absolute inset-0 w-full h-full border-0';
+          // YouTube 滿版全螢幕播放
+          var yStyle = 'width:100%; height:100%; border:0; position:absolute; top:0; left:0;';
           var yAllow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen';
           videoBox.innerHTML = [
-            '<div class="' + wrapCls + '" style="padding-top: 56.25%;">',
-            '<iframe src="' + currentData.embedUrl + '" class="' + yCls + '" allow="' + yAllow + '" allowfullscreen></iframe>',
+            '<div class="relative w-full h-full bg-black overflow-hidden">',
+            '<iframe src="' + currentData.embedUrl + '" style="' + yStyle + '" allow="' + yAllow + '" allowfullscreen></iframe>',
             '</div>'
           ].join('');
         }
       } else {
+        // ★ 照片模式：恢復正常的邊距與底部縮圖列
+        if (mainArea) mainArea.className = 'w-full h-full flex items-center justify-center overflow-hidden pb-32 px-3 md:px-8 pt-20';
+        if (tbContainer) tbContainer.style.display = 'flex';
         if (videoBox) videoBox.style.display = 'none';
         img.style.display = 'block';
         img.style.transition = 'transform 0.1s ease'; 
@@ -661,7 +683,7 @@
         }, 50);
       }
 
-      if (currentData.caption) { 
+      if (currentData.caption && currentData.type === 'image') { 
         captionEl.innerText = currentData.caption; 
         captionEl.style.display = 'inline-block'; 
       } else { 
