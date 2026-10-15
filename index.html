@@ -247,14 +247,25 @@
       }
     }, {passive: true});
 
+// 1. 新增：防止 XSS 攻擊的安全文字轉換函數
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>'"]/g, function(tag) {
+        var charsToReplace = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
+        return charsToReplace[tag] || tag;
+      });
+    }
+
+    // 2. 替換：純淨版的多媒體解析 (只保留圖片與 YouTube，拔除 Drive 影片)
     function parseMediaItem(rawItem) {
       if (!rawItem || typeof rawItem !== 'string') return null;
       var parts = rawItem.split('|||');
       var url = parts[0].trim();
-      var caption = parts.length > 1 ? parts[1].trim() : '';
+      var caption = parts.length > 1 ? escapeHTML(parts[1].trim()) : ''; // 套用安全轉換
       if (!url) return null;
 
-var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/);
+      // 檢查是否為 YouTube
+      var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/);
       if (ytMatch && ytMatch[1]) {
         var ytId = ytMatch[1];
         return {
@@ -265,23 +276,11 @@ var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[
         };
       }
       
-      var isVideo = url.indexOf('#video') !== -1 || /\.(mp4|mov|webm)$/i.test(url);
+      // 其餘一律視為一般照片處理
       var cleanUrl = url.replace('#video', '');
       var driveMatch = cleanUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || cleanUrl.match(/id=([a-zA-Z0-9_-]+)/);
-
-      if (isVideo && driveMatch && driveMatch[1]) {
-        var fileId = driveMatch[1];
-        return {
-          type: 'drive_video',
-          fileId: fileId,
-          directUrl: 'https://drive.google.com/uc?export=download&id=' + fileId,
-          embedUrl: 'https://drive.google.com/file/d/' + fileId + '/preview',
-          thumbUrl: 'https://lh3.googleusercontent.com/d/' + fileId + '=s400',
-          caption: caption
-        };
-      }
-
       var safeImgUrl = (driveMatch && driveMatch[1]) ? 'https://lh3.googleusercontent.com/d/' + driveMatch[1] : cleanUrl;
+      
       return {
         type: 'image',
         url: safeImgUrl,
