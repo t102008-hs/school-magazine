@@ -478,7 +478,7 @@
         contentHtml += '<div class="mb-2.5"><span class="text-xs md:text-sm font-bold text-morandi-dark bg-morandi-light/80 px-3 py-1.5 rounded-full inline-block">' + safeSubCategory + '</span></div>';
         
         // 🌟 優化 2：標題字體放大 (text-lg md:text-xl)
-        if (safeTitle) contentHtml += '<h2 class="text-lg md:text-xl font-bold text-gray-800 line-clamp-3 leading-snug">' + safeTitle + '</h2>';
+        if (safeTitle) contentHtml += '<h2 class="text-lg md:text-xl font-bold text-gray-800 line-clamp-3 leading-snug break-words">' + safeTitle + '</h2>';
         contentHtml += '</div>';
         
         // 🌟 優化 3：封面圖稍微放大 (w-28/h-28) 以平衡大字體，並加入數量標籤
@@ -488,7 +488,7 @@
             
             // 封面圖片
             if (m.thumbUrl) {
-                contentHtml += '<img src="' + m.thumbUrl + '" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
+                contentHtml += '<img src="' + m.thumbUrl + '" loading="lazy" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
             }
             // 若封面是影片，加上播放鍵
             if (m.type === 'youtube' || m.type === 'drive_video') {
@@ -583,17 +583,48 @@
       }, 10);
       var modalInner = document.getElementById('modal-inner'); 
       if (modalInner) modalInner.scrollTop = 0;
+      // 告訴瀏覽器：我們現在進入了「彈窗狀態」
+      history.pushState({ modalOpen: true }, "", "#article-" + articleId);
     }
 
-    function closeModal() {
+// ==========================================
+    // 升級版：關閉彈窗 (整合歷史紀錄)
+    // ==========================================
+    function closeModal(isFromPopState) {
       var modal = document.getElementById('article-modal'); 
       modal.classList.add('translate-x-full'); 
-      modal.classList.add('md:opacity-0');
+      modal.classList.add('md:opacity-0'); 
+      
       setTimeout(function() { 
         modal.style.display = 'none'; 
         document.body.classList.remove('modal-open'); 
+        
+        // 確保關閉時清除 YouTube iframe，避免背景繼續發出聲音
+        var modalContent = document.getElementById('modal-content');
+        if (modalContent) {
+           var iframes = modalContent.getElementsByTagName('iframe');
+           for (var i = 0; i < iframes.length; i++) {
+               iframes[i].src = '';
+           }
+        }
       }, 300);
+
+      // 如果使用者是手動點擊「X」按鈕或背景關閉的，我們就把剛才偷偷塞入的紀錄抵銷掉
+      if (isFromPopState !== true && history.state && history.state.modalOpen) {
+          history.back();
+      }
     }
+
+    // ==========================================
+    // 監聽手機返回鍵
+    // ==========================================
+    window.addEventListener('popstate', function(event) {
+        var modal = document.getElementById('article-modal');
+        // 如果按返回鍵的時候彈窗是開著的，就只關閉彈窗
+        if (modal && modal.style.display === 'flex') {
+            closeModal(true); 
+        }
+    });
    
 function openLightbox(index) {
       if(currentGalleryData.length === 0) return;
