@@ -247,7 +247,9 @@
       }
     }, {passive: true});
 
-// 1. 新增：防止 XSS 攻擊的安全文字轉換函數
+    // ==========================================
+    // 新增防護罩與解析媒體
+    // ==========================================
     function escapeHTML(str) {
       if (!str) return '';
       return String(str).replace(/[&<>'"]/g, function(tag) {
@@ -256,15 +258,13 @@
       });
     }
 
-    // 2. 替換：純淨版的多媒體解析 (只保留圖片與 YouTube，拔除 Drive 影片)
     function parseMediaItem(rawItem) {
       if (!rawItem || typeof rawItem !== 'string') return null;
       var parts = rawItem.split('|||');
       var url = parts[0].trim();
-      var caption = parts.length > 1 ? escapeHTML(parts[1].trim()) : ''; // 套用安全轉換
+      var caption = parts.length > 1 ? escapeHTML(parts[1].trim()) : ''; 
       if (!url) return null;
 
-      // 檢查是否為 YouTube
       var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/);
       if (ytMatch && ytMatch[1]) {
         var ytId = ytMatch[1];
@@ -276,11 +276,9 @@
         };
       }
       
-      // 其餘一律視為一般照片處理
       var cleanUrl = url.replace('#video', '');
       var driveMatch = cleanUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || cleanUrl.match(/id=([a-zA-Z0-9_-]+)/);
       var safeImgUrl = (driveMatch && driveMatch[1]) ? 'https://lh3.googleusercontent.com/d/' + driveMatch[1] : cleanUrl;
-      
       return {
         type: 'image',
         url: safeImgUrl,
@@ -438,6 +436,9 @@
       renderArticles(filtered);
     }
 
+    // ==========================================
+    // 渲染文章列表 (單一封面圖 + 安全防護)
+    // ==========================================
     function renderArticles(articles) {
       var gridContainer = document.getElementById('subcat-grid'); 
       var listContainer = document.getElementById('article-list');
@@ -455,6 +456,11 @@
         card.className = 'article-card bg-white/80 backdrop-blur-sm rounded-[1.5rem] p-4 md:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-white cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95 flex flex-col h-full justify-between';
         card.id = 'article-' + article.id;
         
+        // 套用安全防護
+        var safeTitle = escapeHTML(article.title || '');
+        var safeAuthor = escapeHTML(article.author || '');
+        var safeSubCategory = escapeHTML(article.sub_category || article.main_category || '未分類');
+        
         var mediaList = [];
         if (article.gallery) {
           var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
@@ -466,13 +472,13 @@
         
         var contentHtml = '<div class="flex justify-between items-start gap-4 flex-1">';
         contentHtml += '<div class="flex-1 flex flex-col">';
-        contentHtml += '<div class="mb-2"><span class="text-[10px] md:text-xs font-bold text-morandi-dark bg-morandi-light/80 px-2.5 py-1 rounded-full">' + (article.sub_category || article.main_category || '未分類') + '</span></div>';
-        if (article.title) contentHtml += '<h2 class="text-base md:text-lg font-bold text-gray-800 line-clamp-3 leading-snug">' + article.title + '</h2>';
+        contentHtml += '<div class="mb-2"><span class="text-[10px] md:text-xs font-bold text-morandi-dark bg-morandi-light/80 px-2.5 py-1 rounded-full">' + safeSubCategory + '</span></div>';
+        if (safeTitle) contentHtml += '<h2 class="text-base md:text-lg font-bold text-gray-800 line-clamp-3 leading-snug">' + safeTitle + '</h2>';
         contentHtml += '</div>';
         
-        // 【替換成這段：改為單一精美封面圖】
+        // 改為單一張精美的封面圖，解決拼貼感
         if (mediaList.length > 0) {
-            var m = mediaList[0]; // 取第一張當作代表圖
+            var m = mediaList[0]; 
             contentHtml += '<div class="relative w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-xl overflow-hidden shadow-sm border border-gray-100">';
             if (m.thumbUrl) {
                 contentHtml += '<img src="' + m.thumbUrl + '" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
@@ -484,13 +490,16 @@
         }
         contentHtml += '</div>';
         
-        if (article.author) contentHtml += '<div class="mt-3 pt-3 border-t border-gray-100/80 text-right shrink-0"><span class="text-xs md:text-sm font-bold text-gray-400">作者 / ' + article.author + '</span></div>';
+        if (safeAuthor) contentHtml += '<div class="mt-3 pt-3 border-t border-gray-100/80 text-right shrink-0"><span class="text-xs md:text-sm font-bold text-gray-400">作者 / ' + safeAuthor + '</span></div>';
         
         card.innerHTML = contentHtml; 
         listContainer.appendChild(card);
       });
     }
 
+    // ==========================================
+    // 閱讀文章彈窗 (綁定 Fancybox)
+    // ==========================================
     function openModal(articleId) {
       var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); 
       if(!article) return;
@@ -502,11 +511,10 @@
       
       document.getElementById('modal-author').innerText = article.author ? '作者 / ' + article.author : '';
       document.getElementById('modal-date').innerText = article.publish_date || '';
-      document.getElementById('modal-content').innerText = article.content || '';
+      document.getElementById('modal-content').innerText = article.content || ''; 
       
       var videoContainer = document.getElementById('modal-videos');
       if (videoContainer) { videoContainer.innerHTML = ''; videoContainer.style.display = 'none'; }
-
       var mediaItems = [];
       if (article.gallery) {
         var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
@@ -520,21 +528,13 @@
       var galleryContainer = document.getElementById('modal-gallery');
       galleryContainer.innerHTML = '';
       
-// 【優化版：Drive 影片 16:9 比例與 YouTube 自動播放】
       for (var i = 0; i < mediaItems.length; i++) {
           var m = mediaItems[i];
           var gDiv = document.createElement('a'); 
           
           if (m.type === 'youtube') {
               var ytId = m.embedUrl.match(/embed\/([^?]+)/)[1];
-              // 加入 autoplay=1 參數，點擊縮圖後直接開始播放
               gDiv.href = 'https://www.youtube.com/watch?v=' + ytId + '&autoplay=1';
-          } else if (m.type === 'drive_video') {
-              gDiv.href = m.embedUrl;
-              gDiv.setAttribute('data-type', 'iframe');
-              // 強制賦予 16:9 的解析度基準，解決 Drive 影片變直式白框的問題
-              gDiv.setAttribute('data-width', '1280');
-              gDiv.setAttribute('data-height', '720');
           } else {
               gDiv.href = m.url;
           }
@@ -548,7 +548,7 @@
           if (m.thumbUrl) {
               innerHtml += '<img src="' + m.thumbUrl + '" class="w-full h-full object-cover active:opacity-70 md:hover:opacity-80 transition-opacity" onerror="this.style.display=\'none\'">';
           }
-          if (m.type === 'youtube' || m.type === 'drive_video') {
+          if (m.type === 'youtube') {
               innerHtml += '<div class="absolute inset-0 bg-black/30 flex items-center justify-center transition-transform hover:scale-105"><div class="w-10 h-10 rounded-full bg-white/90 text-morandi-dark flex items-center justify-center shadow-md"><svg class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>';
           }
           gDiv.innerHTML = innerHtml;
