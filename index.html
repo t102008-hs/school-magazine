@@ -539,26 +539,19 @@
             contentHtml += '</div>';
         }
         
+// ------------------------------------------------
+        // 右側：標籤與「標題＋作者」同一行
         // ------------------------------------------------
-        // 右側：恢復經典 3 層結構 (標籤 -> 標題 -> 作者)
-        // ------------------------------------------------
-        contentHtml += '<div class="flex-1 flex flex-col justify-between min-w-0 py-0.5">';
+        contentHtml += '<div class="flex-1 flex flex-col justify-center min-w-0 py-1">';
         
-        // 1. 標籤 ＋ 莫蘭迪色標題
-        contentHtml += '<div>';
-        contentHtml += '<div class="mb-2"><span class="text-xs md:text-sm font-bold text-morandi-dark bg-morandi-light/80 px-3 py-1 rounded-full inline-block">' + safeSubCategory + '</span></div>';
-        if (safeTitle) {
-            // 🌟 關鍵修復 2：標題僅套用莫蘭迪色 text-morandi-dark，不改動換行結構
-            contentHtml += '<h2 class="text-lg md:text-xl font-bold text-morandi-dark line-clamp-2 md:line-clamp-3 leading-snug break-words">' + safeTitle + '</h2>';
-        }
+        // 標籤
+        contentHtml += '<div class="mb-2.5"><span class="text-xs md:text-sm font-bold text-morandi-dark bg-morandi-light/80 px-3 py-1 rounded-full inline-block">' + safeSubCategory + '</span></div>';
+        
+        // 標題 (Morandi 主題色) ＋ 作者 (接在同一行)
+        contentHtml += '<div class="text-lg md:text-xl font-bold text-morandi-dark leading-snug break-words">';
+        if (safeTitle) contentHtml += '<span>' + safeTitle + '</span>';
+        if (safeAuthor) contentHtml += '<span class="inline-block ml-2 text-sm md:text-base font-bold text-gray-400"> 作者 / ' + safeAuthor + '</span>';
         contentHtml += '</div>';
-        
-        // 2. 作者 (獨立在下方靠右)
-        if (safeAuthor) {
-            contentHtml += '<div class="mt-2 text-right">';
-            contentHtml += '<span class="text-sm md:text-base font-bold text-gray-400">作者 / ' + safeAuthor + '</span>';
-            contentHtml += '</div>';
-        }
         
         contentHtml += '</div>'; // 右側結束
         contentHtml += '</div>'; // 容器結束
