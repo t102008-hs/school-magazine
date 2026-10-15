@@ -37,6 +37,13 @@
       Thumbs: { type: "modern" },
     });
   });
+
+  // 🌟 修復 4：保護文章彈窗，全螢幕燈箱關閉時只關閉自己
+    Fancybox.bind("[data-fancybox]", {
+      closeExisting: false,
+      hideScrollbar: false,
+      touch: false // 防止手機下滑圖片時誤把背景彈窗關掉
+    });
 </script>  
 <body class="bg-milktea min-h-[100dvh] text-gray-800 font-sans relative md:flex overflow-x-hidden transition-colors duration-500">
   
@@ -80,7 +87,7 @@
       </button>
       <button id="nav-kinder" class="nav-btn flex flex-col md:flex-row items-center justify-center md:justify-start flex-1 md:w-full transition-all duration-200 text-gray-400 md:hover:bg-white/40 md:p-3 md:rounded-2xl group">
         <svg class="w-[26px] h-[26px] md:w-6 md:h-6 mb-1 md:mb-0 md:mr-3 transition-transform group-hover:-translate-y-0.5 md:group-hover:translate-y-0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3s-6 5-6 10c0 4 3 7 6 7s6-3 6-7c0-5-6-10-6-10z"></path><path d="M9 12a4 4 0 0 0 0 5"></path></svg>
-        <span class="text-[10px] md:text-base font-bold tracking-wider leading-tight">星光<br class="md:hidden">幼兒</span>
+        <span class="text-[10px] md:text-base font-bold tracking-wider leading-tight">星光班<br class="md:hidden">幼兒園</span>
       </button>
     </div>
 
@@ -215,11 +222,20 @@
         else if (navBtn.id === 'nav-middle') targetCat = '中年級'; 
         else if (navBtn.id === 'nav-upper') targetCat = '高年級'; 
         else if (navBtn.id === 'nav-kinder') targetCat = '星光班及幼兒園';
-        if (targetCat) setMainCategory(targetCat, navBtn.id); 
+        if (targetCat) {
+            setMainCategory(targetCat, navBtn.id); 
+            // 🌟 點擊底部主分類時，自動捲動回最上方
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
         return;
       }
       var filterBtn = e.target.closest('.filter-btn'); 
-      if (filterBtn) { setSubCategory(filterBtn.innerText); return; }
+      if (filterBtn) { 
+          setSubCategory(filterBtn.innerText); 
+          // 🌟 點擊上方子分類標籤時，也自動捲動回最上方
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return; 
+      }
       
       var subCatCard = e.target.closest('.sub-cat-card'); 
       if (subCatCard) { setSubCategory(subCatCard.querySelector('.cat-name').innerText); return; }
@@ -553,7 +569,7 @@
     }
 
 // ==========================================
-    // 3. 閱讀彈窗 (修復變數名稱 bug + 智慧適應)
+    // 3. 閱讀彈窗 (標題與作者同行 + YT直接播放 + 燈箱層級修復)
     // ==========================================
     function openModal(articleId) {
       var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); 
@@ -561,19 +577,29 @@
       
       document.getElementById('modal-category').innerText = article.sub_category || article.main_category || '未分類';
       
+      // 🌟 修復 2：標題與作者組合成同一行 (全形空格區隔)
       var modalTitle = document.getElementById('modal-title');
-      if (article.title) { modalTitle.innerText = article.title; modalTitle.style.display = 'block'; } 
-      else { modalTitle.style.display = 'none'; }
+      var safeTitle = escapeHTML(article.title || '');
+      var safeAuthor = escapeHTML(article.author || '');
       
-      // 作者與日期控制
-      var authorStr = article.author ? '作者 / ' + article.author : '';
+      if (safeTitle || safeAuthor) {
+          var titleHtml = safeTitle;
+          if (safeAuthor) {
+              titleHtml += '<span class="text-base md:text-lg font-normal text-gray-400 ml-2"> 作者 / ' + safeAuthor + '</span>';
+          }
+          modalTitle.innerHTML = titleHtml;
+          modalTitle.style.display = 'block';
+      } else {
+          modalTitle.style.display = 'none';
+      }
+      
+      // 日期與 Meta 欄位控制
       var dateStr = article.publish_date || '';
-      document.getElementById('modal-author').innerText = authorStr;
       document.getElementById('modal-date').innerText = dateStr;
       var metaBox = document.getElementById('modal-meta-box');
-      if (!authorStr && !dateStr) { metaBox.style.display = 'none'; } else { metaBox.style.display = 'flex'; }
+      if (!dateStr) { metaBox.style.display = 'none'; } else { metaBox.style.display = 'flex'; }
       
-      // 無內文時隱藏區塊
+      // 無內文時隱藏
       var safeContent = escapeHTML(article.content || '').trim();
       var contentEl = document.getElementById('modal-content');
       if (safeContent) {
@@ -605,28 +631,27 @@
           document.getElementById('modal-inner').className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-5xl w-full max-h-[90vh] overflow-y-auto md:overflow-hidden relative shadow-2xl flex flex-col md:flex-row transition-transform duration-300 scale-95 border border-white";
           
           var mainItem = mediaItems[0];
-          var mainLink = document.createElement('a');
-          mainLink.setAttribute('data-fancybox', 'gallery-' + article.id);
-          if (mainItem.caption) mainLink.setAttribute('data-caption', mainItem.caption);
           
+          // 🌟 修復 3：YouTube 點擊後直接在左側面板播放，不再觸發燈箱
           if (mainItem.type === 'youtube') {
               var ytId = mainItem.embedUrl.match(/embed\/([^?]+)/)[1];
-              mainLink.href = 'https://www.youtube.com/watch?v=' + ytId + '&autoplay=1';
-          } else if (mainItem.type === 'drive_video') {
-              mainLink.href = mainItem.embedUrl;
-              mainLink.setAttribute('data-type', 'iframe');
-              mainLink.setAttribute('data-width', '1280'); mainLink.setAttribute('data-height', '720');
-          } else { mainLink.href = mainItem.url; }
-          
-          mainLink.className = 'group relative w-full h-full flex items-center justify-center cursor-zoom-in';
-          var mainHtml = '<img src="' + mainItem.thumbUrl + '" class="w-full h-auto object-contain max-h-[35vh] md:max-h-[70vh] drop-shadow-md group-hover:scale-105 transition-transform duration-500 rounded-xl" onerror="this.style.display=\'none\'">';
-          
-          // 🌟 修正處：將原本打錯的 m 改回 mainItem
-          if (mainItem.type === 'youtube' || mainItem.type === 'drive_video') {
-              mainHtml += '<div class="absolute inset-0 bg-black/10 flex items-center justify-center group-hover:bg-black/20 transition-colors rounded-xl"><div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/90 text-gray-800 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform"><svg class="w-6 h-6 md:w-8 md:h-8 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>';
+              mainMediaContainer.innerHTML = '<iframe src="https://www.youtube.com/embed/' + ytId + '?autoplay=1" class="w-full h-full min-h-[250px] md:min-h-[350px] rounded-xl shadow-md" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+          } else {
+              // 普通圖片/Drive 影片：綁定 Fancybox
+              var mainLink = document.createElement('a');
+              mainLink.setAttribute('data-fancybox', 'gallery-' + article.id);
+              if (mainItem.caption) mainLink.setAttribute('data-caption', mainItem.caption);
+              
+              if (mainItem.type === 'drive_video') {
+                  mainLink.href = mainItem.embedUrl;
+                  mainLink.setAttribute('data-type', 'iframe');
+                  mainLink.setAttribute('data-width', '1280'); mainLink.setAttribute('data-height', '720');
+              } else { mainLink.href = mainItem.url; }
+              
+              mainLink.className = 'group relative w-full h-full flex items-center justify-center cursor-zoom-in';
+              mainLink.innerHTML = '<img src="' + mainItem.thumbUrl + '" class="w-full h-auto object-contain max-h-[35vh] md:max-h-[70vh] drop-shadow-md group-hover:scale-105 transition-transform duration-500 rounded-xl" onerror="this.style.display=\'none\'">';
+              mainMediaContainer.appendChild(mainLink);
           }
-          mainLink.innerHTML = mainHtml;
-          mainMediaContainer.appendChild(mainLink);
           
           // 處理底部縮圖列
           if (mediaItems.length > 1) {
@@ -673,7 +698,6 @@
       
       history.pushState({ modalOpen: true }, "", "#article-" + articleId);
     }
-
     // ==========================================
     // 升級版：關閉彈窗 (結合平滑縮小動畫)
     // ==========================================
