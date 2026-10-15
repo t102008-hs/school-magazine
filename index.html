@@ -553,7 +553,7 @@
     }
 
 // ==========================================
-    // 3. 閱讀彈窗 (智慧空值適應 + 縮圖對齊)
+    // 3. 閱讀彈窗 (修復變數名稱 bug + 智慧適應)
     // ==========================================
     function openModal(articleId) {
       var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); 
@@ -573,7 +573,7 @@
       var metaBox = document.getElementById('modal-meta-box');
       if (!authorStr && !dateStr) { metaBox.style.display = 'none'; } else { metaBox.style.display = 'flex'; }
       
-      // 🌟 內文控制：如果無內文，直接隱藏，不留下大空框！
+      // 無內文時隱藏區塊
       var safeContent = escapeHTML(article.content || '').trim();
       var contentEl = document.getElementById('modal-content');
       if (safeContent) {
@@ -620,12 +620,15 @@
           
           mainLink.className = 'group relative w-full h-full flex items-center justify-center cursor-zoom-in';
           var mainHtml = '<img src="' + mainItem.thumbUrl + '" class="w-full h-auto object-contain max-h-[35vh] md:max-h-[70vh] drop-shadow-md group-hover:scale-105 transition-transform duration-500 rounded-xl" onerror="this.style.display=\'none\'">';
-          if (mainItem.type === 'youtube' || m.type === 'drive_video') {
+          
+          // 🌟 修正處：將原本打錯的 m 改回 mainItem
+          if (mainItem.type === 'youtube' || mainItem.type === 'drive_video') {
               mainHtml += '<div class="absolute inset-0 bg-black/10 flex items-center justify-center group-hover:bg-black/20 transition-colors rounded-xl"><div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/90 text-gray-800 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform"><svg class="w-6 h-6 md:w-8 md:h-8 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>';
           }
           mainLink.innerHTML = mainHtml;
           mainMediaContainer.appendChild(mainLink);
           
+          // 處理底部縮圖列
           if (mediaItems.length > 1) {
               gallerySection.style.display = 'block';
               for (var i = 1; i < mediaItems.length; i++) {
@@ -643,7 +646,6 @@
                       thumbLink.setAttribute('data-width', '1280'); thumbLink.setAttribute('data-height', '720');
                   } else { thumbLink.href = m.url; }
                   
-                  // 🌟 縮圖改用 aspect-square w-full 自動拉滿網格
                   thumbLink.className = 'relative aspect-square w-full rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all group flex items-center justify-center bg-gray-900 cursor-zoom-in';
                   var thumbHtml = '<img src="' + m.thumbUrl + '" class="w-full h-full object-cover group-hover:opacity-70 transition-opacity" onerror="this.style.display=\'none\'">';
                   if (m.type === 'youtube' || m.type === 'drive_video') {
