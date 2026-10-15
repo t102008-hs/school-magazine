@@ -521,21 +521,26 @@ var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[
       var galleryContainer = document.getElementById('modal-gallery');
       galleryContainer.innerHTML = '';
       
-// 【替換成這段：改用 <a> 標籤並綁定 data-fancybox】
+// 【修正版：精確對應不同媒體的真實網址與播放模式】
       for (var i = 0; i < mediaItems.length; i++) {
           var m = mediaItems[i];
-          var gDiv = document.createElement('a'); // 必須改為 <a> 標籤
+          var gDiv = document.createElement('a'); 
           
-          // 設定點擊後要彈出的圖片/影片真實網址
           if (m.type === 'youtube') {
-              // 把 embed 網址轉回一般 YouTube 網址，Fancybox 才能完美解析播放
-              gDiv.href = m.embedUrl.replace('embed/', 'watch?v=').split('?')[0]; 
+              // 從 embedUrl 抓取 ID，組成 Fancybox 看得懂的標準 YouTube 網址
+              var ytId = m.embedUrl.match(/embed\/([^?]+)/)[1];
+              gDiv.href = 'https://www.youtube.com/watch?v=' + ytId;
+          } else if (m.type === 'drive_video') {
+              // Drive 影片使用內嵌預覽網址，並強制 Fancybox 以 iframe 模式開啟
+              gDiv.href = m.embedUrl;
+              gDiv.setAttribute('data-type', 'iframe');
           } else {
+              // 一般圖片
               gDiv.href = m.url;
           }
           
-          gDiv.setAttribute('data-fancybox', 'gallery-' + article.id); // 自動分組
-          if (m.caption) gDiv.setAttribute('data-caption', m.caption); // 加入圖說
+          gDiv.setAttribute('data-fancybox', 'gallery-' + article.id); 
+          if (m.caption) gDiv.setAttribute('data-caption', m.caption); 
           
           gDiv.className = 'gallery-thumb block relative w-full aspect-square bg-gray-900 overflow-hidden rounded-xl hover:ring-2 hover:ring-morandi-taupe transition-all flex items-center justify-center';
           
