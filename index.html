@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
   <title>香山國小數位校刊</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -27,6 +28,16 @@
     .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
   </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+<script>
+  // 初始化 Fancybox，這樣綁定特定屬性的圖片就會自動具備燈箱功能
+  document.addEventListener("DOMContentLoaded", function() {
+    Fancybox.bind('[data-fancybox]', {
+      // 可以在這裡設定動畫或其他參數
+      Thumbs: { type: "modern" },
+    });
+  });
+</script>  
 <body class="bg-milktea min-h-[100dvh] text-gray-800 font-sans relative md:flex overflow-x-hidden transition-colors duration-500">
   
   <!-- ================= 1. 歡迎頁 ================= -->
@@ -194,8 +205,8 @@
       var card = e.target.closest('.article-card'); 
       if (card) { openModal(card.id.replace('article-', '')); return; }
       
-      var thumb = e.target.closest('.gallery-thumb'); 
-      if (thumb) { openLightbox(parseInt(thumb.id.replace('thumb-', ''), 10)); return; }
+      //var thumb = e.target.closest('.gallery-thumb'); 
+      //if (thumb) { openLightbox(parseInt(thumb.id.replace('thumb-', ''), 10)); return; }
       
       var lbThumb = e.target.closest('[id^="lb-thumb-"]'); 
       if (lbThumb) { currentLightboxIndex = parseInt(lbThumb.id.replace('lb-thumb-', ''), 10); updateLightboxImage(); return; }
@@ -460,19 +471,15 @@ var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[
         if (article.title) contentHtml += '<h2 class="text-base md:text-lg font-bold text-gray-800 line-clamp-3 leading-snug">' + article.title + '</h2>';
         contentHtml += '</div>';
         
+        // 【替換成這段：改為單一精美封面圖】
         if (mediaList.length > 0) {
-            contentHtml += '<div class="relative w-20 h-20 md:w-24 md:h-24 shrink-0">';
-            var displayCount = Math.min(mediaList.length, 3);
-            for (var i = displayCount - 1; i >= 0; i--) {
-                var m = mediaList[i];
-                contentHtml += '<div class="absolute rounded-xl shadow-sm border-[2px] border-white overflow-hidden bg-gray-900 flex items-center justify-center" style="width:calc(100% - 6px); height:calc(100% - 6px); top:' + (i * 3) + 'px; right:' + ((displayCount - 1 - i) * 3) + 'px; z-index:' + (30 - i * 10) + '">';
-                if (m.thumbUrl) {
-                    contentHtml += '<img src="' + m.thumbUrl + '" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
-                }
-                if (m.type === 'youtube' || m.type === 'drive_video') {
-                    contentHtml += '<div class="absolute inset-0 bg-black/30 flex items-center justify-center"><div class="w-7 h-7 rounded-full bg-white/90 text-morandi-dark flex items-center justify-center shadow"><svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>';
-                }
-                contentHtml += '</div>';
+            var m = mediaList[0]; // 取第一張當作代表圖
+            contentHtml += '<div class="relative w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-xl overflow-hidden shadow-sm border border-gray-100">';
+            if (m.thumbUrl) {
+                contentHtml += '<img src="' + m.thumbUrl + '" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
+            }
+            if (m.type === 'youtube' || m.type === 'drive_video') {
+                contentHtml += '<div class="absolute inset-0 bg-black/20 flex items-center justify-center"><div class="w-8 h-8 rounded-full bg-white/90 text-morandi-dark flex items-center justify-center shadow"><svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>';
             }
             contentHtml += '</div>';
         }
@@ -514,11 +521,23 @@ var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[
       var galleryContainer = document.getElementById('modal-gallery');
       galleryContainer.innerHTML = '';
       
+// 【替換成這段：改用 <a> 標籤並綁定 data-fancybox】
       for (var i = 0; i < mediaItems.length; i++) {
           var m = mediaItems[i];
-          var gDiv = document.createElement('div');
-          gDiv.className = 'gallery-thumb relative w-full aspect-square bg-gray-900 overflow-hidden cursor-pointer rounded-xl hover:ring-2 hover:ring-morandi-taupe transition-all flex items-center justify-center';
-          gDiv.id = 'thumb-' + i;
+          var gDiv = document.createElement('a'); // 必須改為 <a> 標籤
+          
+          // 設定點擊後要彈出的圖片/影片真實網址
+          if (m.type === 'youtube') {
+              // 把 embed 網址轉回一般 YouTube 網址，Fancybox 才能完美解析播放
+              gDiv.href = m.embedUrl.replace('embed/', 'watch?v=').split('?')[0]; 
+          } else {
+              gDiv.href = m.url;
+          }
+          
+          gDiv.setAttribute('data-fancybox', 'gallery-' + article.id); // 自動分組
+          if (m.caption) gDiv.setAttribute('data-caption', m.caption); // 加入圖說
+          
+          gDiv.className = 'gallery-thumb block relative w-full aspect-square bg-gray-900 overflow-hidden rounded-xl hover:ring-2 hover:ring-morandi-taupe transition-all flex items-center justify-center';
           
           var innerHtml = '';
           if (m.thumbUrl) {
