@@ -521,21 +521,22 @@ var ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[
       var galleryContainer = document.getElementById('modal-gallery');
       galleryContainer.innerHTML = '';
       
-// 【修正版：精確對應不同媒體的真實網址與播放模式】
+// 【優化版：Drive 影片 16:9 比例與 YouTube 自動播放】
       for (var i = 0; i < mediaItems.length; i++) {
           var m = mediaItems[i];
           var gDiv = document.createElement('a'); 
           
           if (m.type === 'youtube') {
-              // 從 embedUrl 抓取 ID，組成 Fancybox 看得懂的標準 YouTube 網址
               var ytId = m.embedUrl.match(/embed\/([^?]+)/)[1];
-              gDiv.href = 'https://www.youtube.com/watch?v=' + ytId;
+              // 加入 autoplay=1 參數，點擊縮圖後直接開始播放
+              gDiv.href = 'https://www.youtube.com/watch?v=' + ytId + '&autoplay=1';
           } else if (m.type === 'drive_video') {
-              // Drive 影片使用內嵌預覽網址，並強制 Fancybox 以 iframe 模式開啟
               gDiv.href = m.embedUrl;
               gDiv.setAttribute('data-type', 'iframe');
+              // 強制賦予 16:9 的解析度基準，解決 Drive 影片變直式白框的問題
+              gDiv.setAttribute('data-width', '1280');
+              gDiv.setAttribute('data-height', '720');
           } else {
-              // 一般圖片
               gDiv.href = m.url;
           }
           
