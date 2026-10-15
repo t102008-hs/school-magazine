@@ -107,43 +107,45 @@
   </div>
   
 <!-- 🌟 新版：左右分欄閱讀彈窗 (結合 Fancybox) -->
+<!-- 🌟 新版：左右分欄閱讀彈窗 (修復手機滾動與縮圖對齊) -->
   <div id="article-modal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm items-center justify-center p-4 md:p-8 transition-opacity duration-300 opacity-0">
-    <div id="modal-inner" class="bg-white/95 backdrop-blur-md rounded-[2rem] max-w-5xl w-full max-h-[90vh] overflow-hidden relative shadow-2xl flex flex-col md:flex-row transition-transform duration-300 scale-95 border border-white">
+    <!-- 關鍵修正 1：開放 overflow-y-auto 讓手機版內容過長時可自由滾動 -->
+    <div id="modal-inner" class="bg-white/95 backdrop-blur-md rounded-[2rem] max-w-5xl w-full max-h-[90vh] overflow-y-auto md:overflow-hidden relative shadow-2xl flex flex-col md:flex-row transition-transform duration-300 scale-95 border border-white">
       
       <!-- 關閉按鈕 -->
-      <button onclick="closeModal()" class="absolute top-4 right-4 md:top-6 md:right-6 bg-gray-100/80 hover:bg-gray-200 text-gray-500 hover:text-gray-800 rounded-full w-10 h-10 flex items-center justify-center text-xl transition z-[60] shadow-sm">
+      <button onclick="closeModal()" class="absolute top-4 right-4 md:top-6 md:right-6 bg-gray-100/80 hover:bg-gray-200 text-gray-500 hover:text-gray-800 rounded-full w-10 h-10 flex items-center justify-center text-xl transition z-[60] shadow-sm shrink-0">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
 
-      <!-- 左側：主圖視覺區 (第一張圖片或影片) -->
-      <div id="modal-left-panel" class="w-full md:w-2/5 bg-gray-50/50 flex flex-col items-center justify-center p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-200/50 relative overflow-hidden shrink-0">
+      <!-- 左側：主圖視覺區 (手機版限制最大高度，避免卡掉文字) -->
+      <div id="modal-left-panel" class="w-full md:w-2/5 max-h-[35vh] md:max-h-none bg-gray-50/50 flex flex-col items-center justify-center p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200/50 relative overflow-hidden shrink-0">
         <div id="modal-main-media-container" class="w-full h-full flex items-center justify-center relative">
           <!-- JS 會把主圖塞在這裡 -->
         </div>
       </div>
 
       <!-- 右側：圖文與縮圖區 -->
-      <div class="w-full md:w-3/5 flex flex-col p-6 md:p-10 md:overflow-y-auto min-h-0 relative">
-        <div class="mb-3">
-          <!-- ✅ 優化 1：標籤字體放大 (與內文一致 text-base md:text-lg) -->
-          <span id="modal-category" class="text-base md:text-lg font-bold text-morandi-dark bg-morandi-light/80 px-4 py-1.5 rounded-full inline-block tracking-wide"></span>
+      <div class="w-full md:w-3/5 flex flex-col p-5 md:p-10 md:overflow-y-auto min-h-0 relative flex-1">
+        <div class="mb-2">
+          <span id="modal-category" class="text-sm md:text-base font-bold text-morandi-dark bg-morandi-light/80 px-3.5 py-1 rounded-full inline-block tracking-wide"></span>
         </div>
         
-        <!-- ✅ 優化 2：標題顏色改為 text-morandi-dark，不再是死鹹的黑色 -->
-        <h2 id="modal-title" class="text-2xl md:text-3xl font-bold text-morandi-dark mb-4 leading-snug"></h2>
+        <!-- 標題 -->
+        <h2 id="modal-title" class="text-2xl md:text-3xl font-bold text-morandi-dark mb-2 leading-snug"></h2>
         
-        <!-- ✅ 優化 3：作者區塊字體放大 (與內文一致 text-base md:text-lg) -->
-        <div class="flex items-center gap-4 mb-6 border-b border-gray-100 pb-4 text-base md:text-lg font-bold text-gray-400">
+        <!-- 作者與日期 (條件式顯示) -->
+        <div id="modal-meta-box" class="flex items-center gap-4 mb-4 border-b border-gray-100 pb-3 text-sm md:text-base font-bold text-gray-400">
           <span id="modal-author"></span>
           <span id="modal-date"></span>
         </div>
 
-        <div id="modal-content" class="text-gray-700 whitespace-pre-wrap leading-relaxed text-base md:text-lg mb-8 flex-1"></div>
+        <!-- 內文 (若沒內容會自動隱藏) -->
+        <div id="modal-content" class="text-gray-700 whitespace-pre-wrap leading-relaxed text-base md:text-lg mb-6 flex-1"></div>
         
         <!-- 底部微縮圖列 -->
-        <div id="modal-gallery-container" class="mt-auto pt-5 border-t border-gray-100 hidden">
-          <!-- ✅ 優化 4：移除綠色圈起來的「點擊查看更多精彩畫面」提示文字 -->
-          <div id="modal-gallery" class="flex flex-wrap gap-2 md:gap-3">
+        <div id="modal-gallery-container" class="mt-auto pt-4 border-t border-gray-100 hidden">
+          <!-- 關鍵修正 2：使用 grid-cols-4 讓縮圖齊平 4 等分填滿，消除右側空缺 -->
+          <div id="modal-gallery" class="grid grid-cols-4 sm:grid-cols-5 gap-2 md:gap-3 w-full">
              <!-- JS 會把其餘縮圖塞在這裡 -->
           </div>
         </div>
@@ -457,7 +459,7 @@
     }
 
 // ==========================================
-    // 2. 渲染文章列表 (統一改為左圖右文，維持大字體作者)
+    // 2. 渲染文章列表 (標題與作者同一行 + 主題色)
     // ==========================================
     function renderArticles(articles) {
       var gridContainer = document.getElementById('subcat-grid'); 
@@ -493,15 +495,12 @@
           });
         }
         
-        // 🌟 左右分欄容器
-        var contentHtml = '<div class="flex items-stretch gap-4 md:gap-5 flex-1">';
+        var contentHtml = '<div class="flex items-center gap-4 md:gap-5 flex-1">';
         
-        // ------------------------------------------------
-        // 左側區塊：圖片 (移到前面了！)
-        // ------------------------------------------------
+        // 左側：封面圖片
         if (mediaList.length > 0) {
             var m = mediaList[0]; 
-            contentHtml += '<div class="relative w-28 h-28 md:w-36 md:h-36 shrink-0 rounded-xl overflow-hidden shadow-sm border border-gray-100 bg-gray-900">';
+            contentHtml += '<div class="relative w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-xl overflow-hidden shadow-sm border border-gray-100 bg-gray-900">';
             if (m.thumbUrl) {
                 contentHtml += '<img src="' + m.thumbUrl + '" loading="lazy" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
             }
@@ -517,26 +516,18 @@
             contentHtml += '</div>';
         }
         
-        // ------------------------------------------------
-        // 右側區塊：標籤、標題、作者
-        // ------------------------------------------------
-        contentHtml += '<div class="flex-1 flex flex-col justify-between min-w-0">';
+        // 右側：標籤與「標題＋作者」同一行
+        contentHtml += '<div class="flex-1 flex flex-col justify-center min-w-0">';
+        contentHtml += '<div class="mb-2"><span class="text-xs md:text-sm font-bold text-morandi-dark bg-morandi-light/80 px-3 py-1 rounded-full inline-block">' + safeSubCategory + '</span></div>';
         
-        contentHtml += '<div>';
-        contentHtml += '<div class="mb-2.5"><span class="text-xs md:text-sm font-bold text-morandi-dark bg-morandi-light/80 px-3 py-1.5 rounded-full inline-block">' + safeSubCategory + '</span></div>';
-        if (safeTitle) {
-            contentHtml += '<h2 class="text-lg md:text-xl font-bold text-gray-800 line-clamp-3 leading-snug break-words">' + safeTitle + '</h2>';
-        }
+        // 🌟 標題 (Morandi 主題色) ＋ 作者 (接在同一行)
+        contentHtml += '<div class="text-base md:text-lg font-bold text-morandi-dark leading-snug break-words">';
+        if (safeTitle) contentHtml += '<span>' + safeTitle + '</span>';
+        if (safeAuthor) contentHtml += '<span class="inline-block ml-2 text-xs md:text-sm font-bold text-gray-400"> 作者 / ' + safeAuthor + '</span>';
         contentHtml += '</div>';
         
-        if (safeAuthor) {
-            contentHtml += '<div class="mt-3 text-right">';
-            contentHtml += '<span class="text-lg md:text-xl font-bold text-gray-400">作者 / ' + safeAuthor + '</span>';
-            contentHtml += '</div>';
-        }
-        
-        contentHtml += '</div>'; 
-        contentHtml += '</div>'; 
+        contentHtml += '</div>'; // 右側結束
+        contentHtml += '</div>'; // 容器結束
         
         card.innerHTML = contentHtml; 
         listContainer.appendChild(card);
@@ -544,24 +535,36 @@
     }
 
 // ==========================================
-    // 3. 升級版閱讀彈窗 (左大圖 + 右縮圖 + Fancybox)
+    // 3. 閱讀彈窗 (智慧空值適應 + 縮圖對齊)
     // ==========================================
     function openModal(articleId) {
       var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); 
       if(!article) return;
       
-      // 填寫基本文字資訊
       document.getElementById('modal-category').innerText = article.sub_category || article.main_category || '未分類';
+      
       var modalTitle = document.getElementById('modal-title');
       if (article.title) { modalTitle.innerText = article.title; modalTitle.style.display = 'block'; } 
       else { modalTitle.style.display = 'none'; }
-      document.getElementById('modal-author').innerText = article.author ? '作者 / ' + article.author : '';
-      document.getElementById('modal-date').innerText = article.publish_date || '';
       
-      var safeContent = escapeHTML(article.content || '').replace(/\n/g, '<br>');
-      document.getElementById('modal-content').innerHTML = safeContent; 
+      // 作者與日期控制
+      var authorStr = article.author ? '作者 / ' + article.author : '';
+      var dateStr = article.publish_date || '';
+      document.getElementById('modal-author').innerText = authorStr;
+      document.getElementById('modal-date').innerText = dateStr;
+      var metaBox = document.getElementById('modal-meta-box');
+      if (!authorStr && !dateStr) { metaBox.style.display = 'none'; } else { metaBox.style.display = 'flex'; }
       
-      // 解析多媒體資料
+      // 🌟 內文控制：如果無內文，直接隱藏，不留下大空框！
+      var safeContent = escapeHTML(article.content || '').trim();
+      var contentEl = document.getElementById('modal-content');
+      if (safeContent) {
+          contentEl.innerHTML = safeContent.replace(/\n/g, '<br>');
+          contentEl.style.display = 'block';
+      } else {
+          contentEl.style.display = 'none';
+      }
+      
       var mediaItems = [];
       if (article.gallery) {
         var items = String(article.gallery).split(/[\n,]+/).map(function(u) { return u.trim(); }).filter(function(u) { return u; });
@@ -579,12 +582,10 @@
       mainMediaContainer.innerHTML = '';
       galleryContainer.innerHTML = '';
       
-      // 版面動態調整邏輯
       if (mediaItems.length > 0) {
-          leftPanel.style.display = 'flex'; // 顯示左側面板
-          document.getElementById('modal-inner').className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-5xl w-full max-h-[90vh] overflow-hidden relative shadow-2xl flex flex-col md:flex-row transition-transform duration-300 scale-95 border border-white";
+          leftPanel.style.display = 'flex';
+          document.getElementById('modal-inner').className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-5xl w-full max-h-[90vh] overflow-y-auto md:overflow-hidden relative shadow-2xl flex flex-col md:flex-row transition-transform duration-300 scale-95 border border-white";
           
-          // --- 處理第一張圖：放左側大版面 ---
           var mainItem = mediaItems[0];
           var mainLink = document.createElement('a');
           mainLink.setAttribute('data-fancybox', 'gallery-' + article.id);
@@ -600,14 +601,13 @@
           } else { mainLink.href = mainItem.url; }
           
           mainLink.className = 'group relative w-full h-full flex items-center justify-center cursor-zoom-in';
-          var mainHtml = '<img src="' + mainItem.thumbUrl + '" class="w-full h-auto object-contain max-h-[40vh] md:max-h-[70vh] drop-shadow-md group-hover:scale-105 transition-transform duration-500 rounded-xl" onerror="this.style.display=\'none\'">';
-          if (mainItem.type === 'youtube' || mainItem.type === 'drive_video') {
+          var mainHtml = '<img src="' + mainItem.thumbUrl + '" class="w-full h-auto object-contain max-h-[35vh] md:max-h-[70vh] drop-shadow-md group-hover:scale-105 transition-transform duration-500 rounded-xl" onerror="this.style.display=\'none\'">';
+          if (mainItem.type === 'youtube' || m.type === 'drive_video') {
               mainHtml += '<div class="absolute inset-0 bg-black/10 flex items-center justify-center group-hover:bg-black/20 transition-colors rounded-xl"><div class="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/90 text-gray-800 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform"><svg class="w-6 h-6 md:w-8 md:h-8 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div>';
           }
           mainLink.innerHTML = mainHtml;
           mainMediaContainer.appendChild(mainLink);
           
-          // --- 處理第二張以後的圖：放右側底部小縮圖 ---
           if (mediaItems.length > 1) {
               gallerySection.style.display = 'block';
               for (var i = 1; i < mediaItems.length; i++) {
@@ -625,10 +625,11 @@
                       thumbLink.setAttribute('data-width', '1280'); thumbLink.setAttribute('data-height', '720');
                   } else { thumbLink.href = m.url; }
                   
-                  thumbLink.className = 'relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all group flex items-center justify-center bg-gray-900 cursor-zoom-in shrink-0';
+                  // 🌟 縮圖改用 aspect-square w-full 自動拉滿網格
+                  thumbLink.className = 'relative aspect-square w-full rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all group flex items-center justify-center bg-gray-900 cursor-zoom-in';
                   var thumbHtml = '<img src="' + m.thumbUrl + '" class="w-full h-full object-cover group-hover:opacity-70 transition-opacity" onerror="this.style.display=\'none\'">';
                   if (m.type === 'youtube' || m.type === 'drive_video') {
-                      thumbHtml += '<div class="absolute inset-0 bg-black/30 flex items-center justify-center"><svg class="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
+                      thumbHtml += '<div class="absolute inset-0 bg-black/30 flex items-center justify-center"><svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>';
                   }
                   thumbLink.innerHTML = thumbHtml;
                   galleryContainer.appendChild(thumbLink);
@@ -636,13 +637,11 @@
           } else { gallerySection.style.display = 'none'; }
           
       } else {
-          // 如果完全沒有圖片/影片：隱藏左側，讓文字區塊變成置中滿版
           leftPanel.style.display = 'none';
-          document.getElementById('modal-inner').className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-3xl mx-auto w-full max-h-[90vh] overflow-hidden relative shadow-2xl flex flex-col transition-transform duration-300 scale-95 border border-white";
+          document.getElementById('modal-inner').className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-3xl mx-auto w-full max-h-[90vh] overflow-y-auto md:overflow-hidden relative shadow-2xl flex flex-col transition-transform duration-300 scale-95 border border-white";
           gallerySection.style.display = 'none';
       }
       
-      // 開啟彈窗動畫 (套用輔導專區的平滑放大特效)
       var modal = document.getElementById('article-modal'); 
       modal.style.display = 'flex'; 
       document.body.classList.add('modal-open');
@@ -652,7 +651,6 @@
         if (box) box.classList.remove('scale-95');
       }, 10);
       
-      // 紀錄 History API 給手機返回鍵使用
       history.pushState({ modalOpen: true }, "", "#article-" + articleId);
     }
 
