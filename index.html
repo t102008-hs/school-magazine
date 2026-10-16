@@ -478,7 +478,7 @@ window.addEventListener('scroll', function() {
     }
 
 // ==========================================
-    // 2. 渲染文章列表 (修復點擊彈窗 + 恢復經典排版 + 標題莫蘭迪色)
+    // 2. 渲染文章列表 (靠上對齊 + 標題與作者同行)
     // ==========================================
     function renderArticles(articles) {
       var gridContainer = document.getElementById('subcat-grid'); 
@@ -501,10 +501,7 @@ window.addEventListener('scroll', function() {
         card.className = 'article-card bg-white/80 backdrop-blur-sm rounded-[1.5rem] p-4 md:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-white cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 active:scale-95 flex flex-col h-full justify-between';
         card.id = 'article-' + article.id;
         
-        // 🌟 關鍵修復 1：重新綁定卡片點擊事件，恢復彈窗功能
-        card.onclick = function() {
-          openModal(article.id);
-        };
+        card.onclick = function() { openModal(article.id); };
         
         var safeTitle = escapeHTML(article.title || '');
         var safeAuthor = escapeHTML(article.author || '');
@@ -521,12 +518,10 @@ window.addEventListener('scroll', function() {
         
         var contentHtml = '<div class="flex items-stretch gap-4 md:gap-5 flex-1">';
         
-        // ------------------------------------------------
         // 左側：圖片
-        // ------------------------------------------------
         if (mediaList.length > 0) {
             var m = mediaList[0]; 
-            contentHtml += '<div class="relative w-28 h-28 md:w-36 md:h-36 shrink-0 rounded-xl overflow-hidden shadow-sm border border-gray-100 bg-gray-900">';
+            contentHtml += '<div class="relative w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-xl overflow-hidden shadow-sm border border-gray-100 bg-gray-900">';
             if (m.thumbUrl) {
                 contentHtml += '<img src="' + m.thumbUrl + '" loading="lazy" class="w-full h-full object-cover" onerror="this.style.display=\'none\'">';
             }
@@ -542,18 +537,13 @@ window.addEventListener('scroll', function() {
             contentHtml += '</div>';
         }
         
-// ------------------------------------------------
-        // 右側：標籤與「標題＋作者」同一行
-        // ------------------------------------------------
-        contentHtml += '<div class="flex-1 flex flex-col justify-center min-w-0 py-1">';
+        // 🌟 修復處：改為 justify-start 讓內容靠上對齊
+        contentHtml += '<div class="flex-1 flex flex-col justify-start min-w-0 py-1">';
+        contentHtml += '<div class="mb-2"><span class="text-xs md:text-sm font-bold text-morandi-dark bg-morandi-light/80 px-3 py-1 rounded-full inline-block">' + safeSubCategory + '</span></div>';
         
-        // 標籤
-        contentHtml += '<div class="mb-2.5"><span class="text-xs md:text-sm font-bold text-morandi-dark bg-morandi-light/80 px-3 py-1 rounded-full inline-block">' + safeSubCategory + '</span></div>';
-        
-        // 標題 (Morandi 主題色) ＋ 作者 (接在同一行)
-        contentHtml += '<div class="text-lg md:text-xl font-bold text-morandi-dark leading-snug break-words">';
+        contentHtml += '<div class="text-base md:text-lg font-bold text-morandi-dark leading-snug break-words mt-0.5">';
         if (safeTitle) contentHtml += '<span>' + safeTitle + '</span>';
-        if (safeAuthor) contentHtml += '<span class="inline-block ml-2 text-sm md:text-base font-bold text-gray-400"> 作者 / ' + safeAuthor + '</span>';
+        if (safeAuthor) contentHtml += '<span class="inline-block text-xs md:text-sm font-bold text-gray-400"> 作者 / ' + safeAuthor + '</span>';
         contentHtml += '</div>';
         
         contentHtml += '</div>'; // 右側結束
@@ -565,15 +555,15 @@ window.addEventListener('scroll', function() {
     }
 
 // ==========================================
-    // 3. 閱讀彈窗 (標題與作者同行 + YT直接播放 + 燈箱層級修復)
+    // 3. 閱讀彈窗 (智慧判斷：無內文時切換為緊湊置中模式)
     // ==========================================
     function openModal(articleId) {
       var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); 
       if(!article) return;
       
       document.getElementById('modal-category').innerText = article.sub_category || article.main_category || '未分類';
+      var catContainer = document.getElementById('modal-category').parentElement;
       
-      // 🌟 修復 2：標題與作者組合成同一行 (全形空格區隔)
       var modalTitle = document.getElementById('modal-title');
       var safeTitle = escapeHTML(article.title || '');
       var safeAuthor = escapeHTML(article.author || '');
@@ -589,16 +579,15 @@ window.addEventListener('scroll', function() {
           modalTitle.style.display = 'none';
       }
       
-      // 日期與 Meta 欄位控制
       var dateStr = article.publish_date || '';
       document.getElementById('modal-date').innerText = dateStr;
       var metaBox = document.getElementById('modal-meta-box');
       if (!dateStr) { metaBox.style.display = 'none'; } else { metaBox.style.display = 'flex'; }
       
-      // 無內文時隱藏
       var safeContent = escapeHTML(article.content || '').trim();
+      var hasContent = !!safeContent;
       var contentEl = document.getElementById('modal-content');
-      if (safeContent) {
+      if (hasContent) {
           contentEl.innerHTML = safeContent.replace(/\n/g, '<br>');
           contentEl.style.display = 'block';
       } else {
@@ -613,8 +602,11 @@ window.addEventListener('scroll', function() {
           if (parsed) mediaItems.push(parsed);
         });
       }
+      var hasGallery = mediaItems.length > 1;
       
+      var modalInner = document.getElementById('modal-inner');
       var leftPanel = document.getElementById('modal-left-panel');
+      var rightPanel = leftPanel.nextElementSibling;
       var mainMediaContainer = document.getElementById('modal-main-media-container');
       var gallerySection = document.getElementById('modal-gallery-container');
       var galleryContainer = document.getElementById('modal-gallery');
@@ -622,18 +614,39 @@ window.addEventListener('scroll', function() {
       mainMediaContainer.innerHTML = '';
       galleryContainer.innerHTML = '';
       
-      if (mediaItems.length > 0) {
+      // 🌟 核心版面切換邏輯
+      if (!hasContent && !hasGallery && mediaItems.length > 0) {
+          // 模式 A：無內文、單影片/單圖 -> 切換為置中緊湊模式
+          modalInner.className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-2xl mx-auto w-full overflow-hidden relative shadow-2xl flex flex-col transition-transform duration-300 scale-95 border border-white";
+          leftPanel.className = "w-full bg-gray-100 flex flex-col items-center justify-center relative overflow-hidden shrink-0";
+          rightPanel.className = "w-full text-center p-5 md:p-6 bg-white";
+          
+          catContainer.className = "inline-block mb-2 md:mb-0 md:mr-3 align-middle";
+          modalTitle.className = "inline-block text-xl md:text-2xl font-bold text-morandi-dark leading-snug align-middle";
           leftPanel.style.display = 'flex';
-          document.getElementById('modal-inner').className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-5xl w-full max-h-[90vh] overflow-y-auto md:overflow-hidden relative shadow-2xl flex flex-col md:flex-row transition-transform duration-300 scale-95 border border-white";
+          gallerySection.style.display = 'none';
+      } else {
+          // 模式 B：有內文或多圖 -> 正常的左右分欄模式
+          modalInner.className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-5xl mx-auto w-full max-h-[90vh] overflow-y-auto md:overflow-hidden relative shadow-2xl flex flex-col md:flex-row transition-transform duration-300 scale-95 border border-white";
+          leftPanel.className = "w-full md:w-2/5 max-h-[35vh] md:max-h-none bg-gray-50/50 flex flex-col items-center justify-center p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200/50 relative overflow-hidden shrink-0";
+          rightPanel.className = "w-full md:w-3/5 flex flex-col p-5 md:p-10 md:overflow-y-auto min-h-0 relative flex-1 text-left";
           
+          catContainer.className = "mb-2 block";
+          modalTitle.className = "text-2xl md:text-3xl font-bold text-morandi-dark mb-2 leading-snug block";
+          
+          if (mediaItems.length > 0) leftPanel.style.display = 'flex';
+          else leftPanel.style.display = 'none';
+      }
+      
+      // 媒體渲染
+      if (mediaItems.length > 0) {
           var mainItem = mediaItems[0];
+          var ytMinHeight = (!hasContent && !hasGallery) ? 'md:min-h-[450px]' : 'md:min-h-[350px]'; // 緊湊模式下影片稍微放大
           
-          // 🌟 修復 3：YouTube 點擊後直接在左側面板播放，不再觸發燈箱
           if (mainItem.type === 'youtube') {
               var ytId = mainItem.embedUrl.match(/embed\/([^?]+)/)[1];
-              mainMediaContainer.innerHTML = '<iframe src="https://www.youtube.com/embed/' + ytId + '?autoplay=1" class="w-full h-full min-h-[250px] md:min-h-[350px] rounded-xl shadow-md" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+              mainMediaContainer.innerHTML = '<iframe src="https://www.youtube.com/embed/' + ytId + '?autoplay=1" class="w-full h-full min-h-[250px] ' + ytMinHeight + ' rounded-xl shadow-md" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
           } else {
-              // 普通圖片/Drive 影片：綁定 Fancybox
               var mainLink = document.createElement('a');
               mainLink.setAttribute('data-fancybox', 'gallery-' + article.id);
               if (mainItem.caption) mainLink.setAttribute('data-caption', mainItem.caption);
@@ -649,15 +662,13 @@ window.addEventListener('scroll', function() {
               mainMediaContainer.appendChild(mainLink);
           }
           
-          // 處理底部縮圖列
-          if (mediaItems.length > 1) {
+          if (hasGallery) {
               gallerySection.style.display = 'block';
               for (var i = 1; i < mediaItems.length; i++) {
                   var m = mediaItems[i];
                   var thumbLink = document.createElement('a');
                   thumbLink.setAttribute('data-fancybox', 'gallery-' + article.id);
                   if (m.caption) thumbLink.setAttribute('data-caption', m.caption);
-                  
                   if (m.type === 'youtube') {
                       var yId = m.embedUrl.match(/embed\/([^?]+)/)[1];
                       thumbLink.href = 'https://www.youtube.com/watch?v=' + yId + '&autoplay=1';
@@ -666,7 +677,6 @@ window.addEventListener('scroll', function() {
                       thumbLink.setAttribute('data-type', 'iframe');
                       thumbLink.setAttribute('data-width', '1280'); thumbLink.setAttribute('data-height', '720');
                   } else { thumbLink.href = m.url; }
-                  
                   thumbLink.className = 'relative aspect-square w-full rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all group flex items-center justify-center bg-gray-900 cursor-zoom-in';
                   var thumbHtml = '<img src="' + m.thumbUrl + '" class="w-full h-full object-cover group-hover:opacity-70 transition-opacity" onerror="this.style.display=\'none\'">';
                   if (m.type === 'youtube' || m.type === 'drive_video') {
@@ -675,12 +685,15 @@ window.addEventListener('scroll', function() {
                   thumbLink.innerHTML = thumbHtml;
                   galleryContainer.appendChild(thumbLink);
               }
-          } else { gallerySection.style.display = 'none'; }
-          
+          }
       } else {
-          leftPanel.style.display = 'none';
-          document.getElementById('modal-inner').className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-3xl mx-auto w-full max-h-[90vh] overflow-y-auto md:overflow-hidden relative shadow-2xl flex flex-col transition-transform duration-300 scale-95 border border-white";
-          gallerySection.style.display = 'none';
+          // 若完全沒有任何媒體
+          if (!hasContent) {
+              modalInner.className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-2xl mx-auto w-full overflow-hidden relative shadow-2xl flex flex-col transition-transform duration-300 scale-95 border border-white text-center";
+              rightPanel.className = "w-full text-center p-6 md:p-10 bg-white";
+              catContainer.className = "inline-block mb-3 align-middle";
+              modalTitle.className = "text-xl md:text-2xl font-bold text-morandi-dark leading-snug align-middle block";
+          }
       }
       
       var modal = document.getElementById('article-modal'); 
