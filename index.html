@@ -188,7 +188,10 @@
     var lastTouchTime = 0, touchStartDistance = 0, isPinching = false, lastTouchX = 0, lastTouchY = 0;
     var lastScrollTop = 0;
     
-    window.addEventListener('scroll', function() {
+window.addEventListener('scroll', function() {
+      // 🌟 加入這行：如果螢幕寬度大於等於 768px (電腦版/平板)，直接跳出不執行隱藏
+      if (window.innerWidth >= 768) return;
+      
       var st = window.pageYOffset || document.documentElement.scrollTop;
       var bottomNav = document.getElementById('bottom-nav');
       if (st > lastScrollTop && st > 60) { 
