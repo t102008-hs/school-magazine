@@ -555,7 +555,7 @@ window.addEventListener('scroll', function() {
     }
 
 // ==========================================
-    // 3. 閱讀彈窗 (智慧判斷：無內文時切換為緊湊置中模式)
+    // 3. 閱讀彈窗 (智慧判斷：依據有無內文決定版型，無內文時完美同行)
     // ==========================================
     function openModal(articleId) {
       var article = globalArticles.find(function(a) { return String(a.id) === String(articleId); }); 
@@ -614,24 +614,22 @@ window.addEventListener('scroll', function() {
       mainMediaContainer.innerHTML = '';
       galleryContainer.innerHTML = '';
       
-// 🌟 核心版面切換邏輯
-      if (!hasGallery && mediaItems.length > 0) {
-          // 模式 A：單圖或單影片 (不管有無內文都用上下排版，靠左對齊)
+      // 🌟 核心版面切換邏輯
+      if (!hasContent && !hasGallery && mediaItems.length > 0) {
+          // 模式 A：單圖或單影片 且【無內文】 -> 上下緊湊排版
           modalInner.className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-2xl mx-auto w-full max-h-[90vh] overflow-y-auto md:overflow-hidden relative shadow-2xl flex flex-col transition-transform duration-300 scale-95 border border-white";
           leftPanel.className = "w-full bg-gray-100 flex flex-col items-center justify-center relative overflow-hidden shrink-0";
           
-          // 這裡改成 text-left 靠左對齊
-          rightPanel.className = "w-full text-left p-5 md:p-6 bg-white overflow-y-auto";
+          // 關鍵修復：使用 flex-row 讓容器內的「標籤」與「標題+作者」強制併成完美的一行
+          rightPanel.className = "w-full text-left p-4 md:p-6 bg-white flex flex-row flex-wrap items-center";
           
-          catContainer.className = "inline-block mb-2 md:mb-0 mr-3 align-middle";
-          modalTitle.className = "inline-block text-xl md:text-2xl font-bold text-morandi-dark leading-snug align-middle";
+          catContainer.className = "mr-3"; // 取消原本的底部間距，改為右側間距
+          modalTitle.className = "text-xl md:text-2xl font-bold text-morandi-dark leading-snug";
+          
           leftPanel.style.display = 'flex';
           gallerySection.style.display = 'none';
-          
-          // 讓內文與上方的標題列保持距離
-          contentEl.className = "mt-4 text-base text-gray-700 leading-relaxed";
       } else {
-          // 模式 B：多圖 或 無圖純文字 -> 正常的左右分欄模式
+          // 模式 B：【有內文】 或 多圖 或 無圖 -> 恢復原本的左右分欄排版
           modalInner.className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-5xl mx-auto w-full max-h-[90vh] overflow-y-auto md:overflow-hidden relative shadow-2xl flex flex-col md:flex-row transition-transform duration-300 scale-95 border border-white";
           leftPanel.className = "w-full md:w-2/5 max-h-[35vh] md:max-h-none bg-gray-50/50 flex flex-col items-center justify-center p-4 md:p-8 border-b md:border-b-0 md:border-r border-gray-200/50 relative overflow-hidden shrink-0";
           rightPanel.className = "w-full md:w-3/5 flex flex-col p-5 md:p-10 md:overflow-y-auto min-h-0 relative flex-1 text-left";
@@ -641,14 +639,12 @@ window.addEventListener('scroll', function() {
           
           if (mediaItems.length > 0) leftPanel.style.display = 'flex';
           else leftPanel.style.display = 'none';
-          
-          contentEl.className = "mt-4 text-base text-gray-700 leading-relaxed flex-1";
       }
       
       // 媒體渲染
       if (mediaItems.length > 0) {
           var mainItem = mediaItems[0];
-          var ytMinHeight = (!hasContent && !hasGallery) ? 'md:min-h-[450px]' : 'md:min-h-[350px]'; // 緊湊模式下影片稍微放大
+          var ytMinHeight = (!hasContent && !hasGallery) ? 'md:min-h-[450px]' : 'md:min-h-[350px]';
           
           if (mainItem.type === 'youtube') {
               var ytId = mainItem.embedUrl.match(/embed\/([^?]+)/)[1];
@@ -694,12 +690,12 @@ window.addEventListener('scroll', function() {
               }
           }
       } else {
-          // 若完全沒有任何媒體
+          // 完全沒有任何媒體時
           if (!hasContent) {
               modalInner.className = "bg-white/95 backdrop-blur-md rounded-[2rem] max-w-2xl mx-auto w-full overflow-hidden relative shadow-2xl flex flex-col transition-transform duration-300 scale-95 border border-white text-center";
-              rightPanel.className = "w-full text-center p-6 md:p-10 bg-white";
-              catContainer.className = "inline-block mb-3 align-middle";
-              modalTitle.className = "text-xl md:text-2xl font-bold text-morandi-dark leading-snug align-middle block";
+              rightPanel.className = "w-full text-center p-6 md:p-10 bg-white flex flex-row flex-wrap items-center justify-center";
+              catContainer.className = "mr-3";
+              modalTitle.className = "text-xl md:text-2xl font-bold text-morandi-dark leading-snug";
           }
       }
       
