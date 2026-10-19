@@ -475,6 +475,13 @@ window.addEventListener('scroll', function() {
       var filtered = globalArticles.filter(function(a) { return a.main_category === currentMainCategory; });
       if (currentSubCategory) filtered = filtered.filter(function(a) { return a.sub_category === currentSubCategory; });
       renderArticles(filtered);
+      if (currentSubCategory === '校長室' || currentSubCategory === '家長會長') {
+        if (filtered && filtered.length === 1) {
+          setTimeout(function() {
+            openModal(filtered[0].id);
+          }, 50); // 稍微延遲 50 毫秒，確保背景的卡片已經渲染完畢
+        }
+      }
     }
 
 // ==========================================
