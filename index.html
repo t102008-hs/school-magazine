@@ -329,7 +329,7 @@ window.addEventListener('scroll', function() {
     }
 
     function sortSubCategories(subs) {
-      var orderMap = { '校長室': 1, '家長會長': 2, '教務處': 3, '學務處': 4, '總務處': 5, '輔導室': 6, '忠班': 11, '孝班': 12, '仁班': 13, '愛班': 14, '信班': 15, '義班': 16, '和班': 17, '藍鯨班': 21, '海馬班': 22, '珊瑚班': 23, '海豚班': 24, '星光班': 25 };
+      var orderMap = { '校長': 1, '家長會長': 2, '教務處': 3, '學務處': 4, '總務處': 5, '輔導室': 6, '忠班': 11, '孝班': 12, '仁班': 13, '愛班': 14, '信班': 15, '義班': 16, '和班': 17, '藍鯨班': 21, '海馬班': 22, '珊瑚班': 23, '海豚班': 24, '星光班': 25 };
       return subs.sort(function(a, b) {
         var weightA = 999, weightB = 999;
         for (var key in orderMap) { if (a.indexOf(key) !== -1) weightA = orderMap[key]; }
@@ -475,7 +475,7 @@ window.addEventListener('scroll', function() {
       var filtered = globalArticles.filter(function(a) { return a.main_category === currentMainCategory; });
       if (currentSubCategory) filtered = filtered.filter(function(a) { return a.sub_category === currentSubCategory; });
       renderArticles(filtered);
-      if (currentSubCategory === '校長室' || currentSubCategory === '家長會長') {
+      if (currentSubCategory === '校長' || currentSubCategory === '家長會長') {
         if (filtered && filtered.length === 1) {
           setTimeout(function() {
             openModal(filtered[0].id);
