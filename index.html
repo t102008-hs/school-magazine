@@ -471,15 +471,35 @@ window.addEventListener('scroll', function() {
       });
     }
 
-    function filterArticles() {
+function filterArticles() {
       var filtered = globalArticles.filter(function(a) { return a.main_category === currentMainCategory; });
       if (currentSubCategory) filtered = filtered.filter(function(a) { return a.sub_category === currentSubCategory; });
+      
+      // 渲染卡片列表
       renderArticles(filtered);
-      if (currentSubCategory === '校長' || currentSubCategory === '家長會長') {
+
+      // 🌟 修正：精準開啟「校長」或「家長會長」彈窗
+      if (currentSubCategory === '校長' || currentSubCategory === '校長室' || currentSubCategory === '家長會長') {
         if (filtered && filtered.length === 1) {
           setTimeout(function() {
-            openModal(filtered[0].id);
-          }, 50); // 稍微延遲 50 毫秒，確保背景的卡片已經渲染完畢
+            var targetArticle = filtered[0];
+            
+            // 找出這篇文章在 globalArticles 全站陣列中的真實索引 (Index)
+            var globalIndex = globalArticles.findIndex(function(a) {
+              return a.title === targetArticle.title && a.sub_category === targetArticle.sub_category;
+            });
+
+            // 優先傳入 ID，若 openModal 吃 Index 則傳入 globalIndex
+            if (typeof openModal === 'function') {
+              if (targetArticle.id) {
+                openModal(targetArticle.id);
+              } else if (globalIndex !== -1) {
+                openModal(globalIndex);
+              } else {
+                openModal(targetArticle);
+              }
+            }
+          }, 50);
         }
       }
     }
